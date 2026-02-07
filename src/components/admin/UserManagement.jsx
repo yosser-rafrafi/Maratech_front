@@ -8,6 +8,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterRole, setFilterRole] = useState(allowedRoles.length === 1 ? allowedRoles[0] : 'all');
+    const [searchName, setSearchName] = useState('');
     const [userTypeTab, setUserTypeTab] = useState('staff'); // 'staff' or 'eleves'
 
     // Form Data
@@ -136,7 +137,11 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
         // Filter dropdown
         const roleFilterMatch = filterRole === 'all' || u.role === filterRole;
 
-        return statusMatch && tabMatch && roleScopeMatch && roleFilterMatch;
+        // Search by name or email
+        const searchLower = searchName.trim().toLowerCase();
+        const nameMatch = !searchLower || (u.name?.toLowerCase().includes(searchLower) || u.email?.toLowerCase().includes(searchLower));
+
+        return statusMatch && tabMatch && roleScopeMatch && roleFilterMatch && nameMatch;
     });
 
     const getStatusBadge = (status) => {
@@ -155,7 +160,14 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
         <div className="dashboard-section">
             <div className="flex justify-between items-center mb-4">
                 <h2>{title}</h2>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap items-center gap-4">
+                    <input
+                        type="text"
+                        placeholder="Rechercher par nom ou email..."
+                        value={searchName}
+                        onChange={(e) => setSearchName(e.target.value)}
+                        className="p-2 border rounded-lg text-sm min-w-[200px] placeholder:text-slate-400"
+                    />
                     {userTypeTab !== 'eleves' && (
                         <select
                             value={filterStatus}
