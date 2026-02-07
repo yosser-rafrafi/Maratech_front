@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../config/api';
+import ConfirmModal, { STATUS_LABELS } from '../ConfirmModal';
+import AlertModal from '../AlertModal';
 
 const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title = 'Gestion des États', showRoleFilter = true, onViewDetails }) => {
     const [users, setUsers] = useState([]);
@@ -12,6 +14,23 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
     const [userData, setUserData] = useState({ name: '', email: '', password: '', role: allowedRoles[0] || 'student' });
     const [editingUser, setEditingUser] = useState(null);
     const [showForm, setShowForm] = useState(false);
+
+    // Confirmation modal
+    const [confirmModal, setConfirmModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        variant: 'primary',
+        onConfirm: () => {}
+    });
+
+    // Alert modal (success/error feedback)
+    const [alertModal, setAlertModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        variant: 'success'
+    });
 
     useEffect(() => {
         fetchUsers();
@@ -48,34 +67,60 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
             setEditingUser(null);
             setShowForm(false);
             fetchUsers();
-            alert(editingUser ? 'Utilisateur mis à jour' : 'Utilisateur créé avec succès');
+            setAlertModal({
+                isOpen: true,
+                title: 'Succès',
+                message: editingUser ? 'Utilisateur mis à jour.' : 'Utilisateur créé avec succès.',
+                variant: 'success'
+            });
         } catch (error) {
-            alert(error.response?.data?.error || 'Erreur lors de l\'enregistrement');
+            setAlertModal({
+                isOpen: true,
+                title: 'Erreur',
+                message: error.response?.data?.error || 'Erreur lors de l\'enregistrement.',
+                variant: 'error'
+            });
         }
     };
 
-    const handleStatusChange = async (userId, newStatus) => {
-        if (!window.confirm(`Confirmer le changement de statut vers : ${newStatus} ?`)) return;
-        try {
-            await api.put(`/admin/users/${userId}/status`, { status: newStatus });
-            fetchUsers();
-        } catch (error) {
-            alert(error.response?.data?.error || 'Erreur lors de la mise à jour du statut');
-        }
+    const handleStatusChange = (user, newStatus) => {
+        const statusLabel = STATUS_LABELS[newStatus] || newStatus;
+        setConfirmModal({
+            isOpen: true,
+            title: 'Changer le statut',
+            message: `Voulez-vous passer le statut de ${user.name} vers ${statusLabel} ?`,
+            variant: newStatus === 'rejected' ? 'warning' : 'primary',
+            onConfirm: async () => {
+                try {
+                    await api.put(`/admin/users/${user._id}/status`, { status: newStatus });
+                    fetchUsers();
+                } catch (error) {
+                    setAlertModal({
+                        isOpen: true,
+                        title: 'Erreur',
+                        message: error.response?.data?.error || 'Erreur lors de la mise à jour du statut.',
+                        variant: 'error'
+                    });
+                }
+            }
+        });
     };
 
-    const handleDelete = async (userId) => {
-        if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) return;
-        try {
-            // Assuming there is a delete endpoint, if not we suspend
-            // api.delete maps to suspend usually in this system, but let's assume specific delete or we just suspend
-            await api.put(`/admin/users/${userId}/status`, { status: 'rejected' }); // specific behavior?
-            // Actually usually DELETE /admin/users/:id
-            // If not implemented, I'll just use status 'rejected'/suspended
-            fetchUsers();
-        } catch (error) {
-            console.error(error);
-        }
+    const handleDelete = (user) => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Supprimer l\'utilisateur',
+            message: `Êtes-vous sûr de vouloir supprimer ${user.name} ? Cette action est irréversible.`,
+            variant: 'danger',
+            onConfirm: async () => {
+                try {
+                    await api.put(`/admin/users/${user._id}/status`, { status: 'rejected' });
+                    fetchUsers();
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        });
     };
 
     const filteredUsers = users.filter(u => {
@@ -228,6 +273,26 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                 </div>
             )}
 
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                variant={confirmModal.variant}
+                confirmLabel="Confirmer"
+                cancelLabel="Annuler"
+            />
+
+            <AlertModal
+                isOpen={alertModal.isOpen}
+                onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
+                title={alertModal.title}
+                message={alertModal.message}
+                variant={alertModal.variant}
+                okLabel="OK"
+            />
+
             <div className="table-container bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                 <table className="w-full text-sm">
                     <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-xs">
@@ -287,7 +352,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                     <button
                                                         title="Supprimer"
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                        onClick={() => handleDelete(u._id)}
+                                                        onClick={() => handleDelete(u)}
                                                     >
                                                         <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
                                                         <span>Supprimer</span>
@@ -301,7 +366,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                             <button
                                                                 title="Approuver"
                                                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                                onClick={() => handleStatusChange(u._id, 'active')}
+                                                                onClick={() => handleStatusChange(u, 'active')}
                                                             >
                                                                 <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>
                                                                 <span>Approuver</span>
@@ -309,7 +374,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                             <button
                                                                 title="Rejeter"
                                                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                                onClick={() => handleStatusChange(u._id, 'rejected')}
+                                                                onClick={() => handleStatusChange(u, 'rejected')}
                                                             >
                                                                 <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>cancel</span>
                                                                 <span>Rejeter</span>
@@ -320,7 +385,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                         <button
                                                             title="Suspendre"
                                                             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                            onClick={() => handleStatusChange(u._id, 'suspended')}
+                                                            onClick={() => handleStatusChange(u, 'suspended')}
                                                         >
                                                             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>pause_circle</span>
                                                             <span>Suspendre</span>
@@ -330,7 +395,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                         <button
                                                             title="Réactiver"
                                                             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                            onClick={() => handleStatusChange(u._id, 'active')}
+                                                            onClick={() => handleStatusChange(u, 'active')}
                                                         >
                                                             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>play_circle</span>
                                                             <span>Réactiver</span>
@@ -351,7 +416,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                     <button
                                                         title="Supprimer"
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                        onClick={() => handleDelete(u._id)}
+                                                        onClick={() => handleDelete(u)}
                                                     >
                                                         <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
                                                         <span>Supprimer</span>

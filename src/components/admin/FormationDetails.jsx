@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../config/api';
+import ConfirmModal from '../ConfirmModal';
 
 const FormationDetails = ({ formation, onBack }) => {
     const [levels, setLevels] = useState([]);
@@ -23,6 +24,15 @@ const FormationDetails = ({ formation, onBack }) => {
     const [showEnrollModal, setShowEnrollModal] = useState(false);
     const [enrollUserId, setEnrollUserId] = useState('');
     const [availableStudents, setAvailableStudents] = useState([]);
+
+    // Modal State
+    const [modalConfig, setModalConfig] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => { },
+        type: 'warning'
+    });
 
     useEffect(() => {
         if (showEnrollModal) {
@@ -92,15 +102,21 @@ const FormationDetails = ({ formation, onBack }) => {
         }
     };
 
-    const handleDeleteSession = async (sessionId) => {
-        if (window.confirm('Supprimer cette séance ?')) {
-            try {
-                await api.delete(`/sessions/${sessionId}`);
-                fetchData();
-            } catch (error) {
-                console.error('Error deleting session:', error);
+    const handleDeleteSession = (sessionId) => {
+        setModalConfig({
+            isOpen: true,
+            title: 'Supprimer la séance',
+            message: 'Êtes-vous sûr de vouloir supprimer cette séance ?',
+            type: 'danger',
+            onConfirm: async () => {
+                try {
+                    await api.delete(`/sessions/${sessionId}`);
+                    fetchData();
+                } catch (error) {
+                    console.error('Error deleting session:', error);
+                }
             }
-        }
+        });
     };
 
     const openSessionModal = (level, session = null) => {
