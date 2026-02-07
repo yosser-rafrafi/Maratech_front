@@ -13,6 +13,7 @@ import ResponsableDashboard from './pages/ResponsableDashboard';
 import Calendar from './pages/Calendar';
 import Profile from './pages/Profile';
 import AttendancePage from './pages/AttendancePage';
+import StudentDashboard from './pages/StudentDashboard';
 
 import './App.css';
 
@@ -32,7 +33,7 @@ const Home = () => {
   } else if (user.role === 'Responsable') {
     return <Navigate to="/responsable" replace />;
   } else if (user.role === 'student' || user.role === 'élève') {
-    return <Navigate to="/participant" replace />;
+    return <Navigate to="/student-dashboard" replace />;
   } else {
     return <Navigate to="/login" replace />;
   }
@@ -80,6 +81,15 @@ function App() {
             element={
               <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
                 <ParticipantDashboard />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/student-dashboard"
+            element={
+              <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
+                <StudentDashboard />
               </PrivateRoute>
             }
           />
