@@ -49,7 +49,7 @@ const ResponsableDashboard = () => {
                 <header className="page-header">
                     <div>
                         <h1>{t('dashboards.resp_title')}</h1>
-                        <p>{t('dashboards.resp_subtitle', { defaultValue: 'Gestion pédagogique et suivi des formations.' })}</p>
+                        <p>{t('dashboards.resp_subtitle')}</p>
                     </div>
 
                     <div className="header-tabs">
@@ -72,7 +72,7 @@ const ResponsableDashboard = () => {
                                     color="#3b82f6"
                                 />
                                 <StatCard
-                                    title={t('dashboards.stats.students_followed', { defaultValue: 'Élèves Suivis' })}
+                                    title={t('dashboards.stats.students_followed')}
                                     value={stats.students}
                                     icon="group"
                                     color="#10b981"
@@ -84,7 +84,7 @@ const ResponsableDashboard = () => {
                                     color="#f59e0b"
                                 />
                                 <StatCard
-                                    title={t('dashboards.stats.total_hours', { defaultValue: 'Heures Totales' })}
+                                    title={t('dashboards.stats.total_hours')}
                                     value="1,240"
                                     icon="schedule"
                                     color="#8b5cf6"
@@ -94,13 +94,13 @@ const ResponsableDashboard = () => {
                             {/* Charts Row */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Répartition des Élèves</h3>
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.student_distribution')}</h3>
                                     <div className="h-64">
                                         <FormationDistributionChart />
                                     </div>
                                 </div>
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Progression Générale</h3>
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.general_progress')}</h3>
                                     <div className="h-64">
                                         <ProgressLineChart />
                                     </div>
@@ -115,7 +115,7 @@ const ResponsableDashboard = () => {
                         <UserManagement
                             allowedRoles={['student', 'formateur']}
                             canApprove={false}
-                            title={t('dashboards.users_management', { defaultValue: 'Gestion des Utilisateurs' })}
+                            title={t('dashboards.users_management')}
                             showRoleFilter={true}
                             onViewDetails={setViewingStudent}
                         />
@@ -124,7 +124,7 @@ const ResponsableDashboard = () => {
                     {activeTab === 'students' && viewingStudent && (
                         <div className="animation-fade-in">
                             <button onClick={() => setViewingStudent(null)} className="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-2">
-                                <span>←</span> {t('common.back_to_list', { defaultValue: 'Retour à la liste' })}
+                                <span>←</span> {t('common.back_to_list')}
                             </button>
                             <StudentDetails student={viewingStudent} />
                         </div>

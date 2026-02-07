@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../config/api';
 import Sidebar from '../components/Sidebar';
 import './Calendar.css';
@@ -8,6 +9,7 @@ const Calendar = () => {
     const [sessions, setSessions] = useState([]);
     const [formations, setFormations] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { t, i18n } = useTranslation();
 
     useEffect(() => {
         const loadCalendarData = async () => {
@@ -48,10 +50,15 @@ const Calendar = () => {
     const firstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
 
     const renderHeader = () => {
-        const monthNames = [
-            "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-            "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
-        ];
+        const monthNames = i18n.language.startsWith('ar') || i18n.language === 'tn'
+            ? ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
+            : i18n.language === 'de'
+                ? ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
+                : i18n.language === 'zh'
+                    ? ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+                    : i18n.language === 'en'
+                        ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+                        : ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
         return (
             <div className="calendar-header">
                 <button onClick={prevMonth} className="btn-icon">❮</button>
@@ -62,7 +69,15 @@ const Calendar = () => {
     };
 
     const renderDays = () => {
-        const days = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+        const days = i18n.language.startsWith('ar') || i18n.language === 'tn'
+            ? ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"]
+            : i18n.language === 'de'
+                ? ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+                : i18n.language === 'zh'
+                    ? ["日", "一", "二", "三", "四", "五", "六"]
+                    : i18n.language === 'en'
+                        ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+                        : ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
         return (
             <div className="calendar-days-header">
                 {days.map(day => <div key={day} className="day-name">{day}</div>)}
@@ -103,8 +118,8 @@ const Calendar = () => {
                     <span className="day-number">{day}</span>
                     <div className="cell-sessions">
                         {dayFormations.map(f => (
-                            <div key={`form-${f._id}`} className="session-tag formation-start" title={`Début: ${f.title}`}>
-                                <span className="session-time">🏁 DÉBUT</span>
+                            <div key={`form-${f._id}`} className="session-tag formation-start" title={`${t('dashboards.start', { defaultValue: 'Start' })}: ${f.title}`}>
+                                <span className="session-time">🏁 {t('dashboards.start', { defaultValue: 'START' })}</span>
                                 <span className="session-title">{f.title}</span>
                             </div>
                         ))}
@@ -128,8 +143,8 @@ const Calendar = () => {
             <main className="main-content">
                 <header className="page-header">
                     <div>
-                        <h1>Calendrier des Formations</h1>
-                        <p>Visualisez toutes les sessions programmées sur le mois.</p>
+                        <h1>{t('sidebar.calendar')}</h1>
+                        <p>{t('calendar.subtitle', { defaultValue: 'View all scheduled sessions for the month.' })}</p>
                     </div>
                 </header>
 
@@ -137,7 +152,7 @@ const Calendar = () => {
                     {renderHeader()}
                     {renderDays()}
                     {loading ? (
-                        <div className="calendar-loading">Chargement...</div>
+                        <div className="calendar-loading">{t('common.loading')}</div>
                     ) : (
                         renderCells()
                     )}

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import Sidebar from '../components/Sidebar';
 import api from '../config/api';
 import './Dashboard.css'; // Reuse dashboard styles
 
 const Profile = () => {
     const { user, setUser } = useAuth();
+    const { t } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
         name: user?.name || '',
@@ -13,7 +15,7 @@ const Profile = () => {
         password: ''
     });
 
-    if (!user) return <div>Chargement...</div>;
+    if (!user) return <div>{t('common.loading')}</div>;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,9 +29,9 @@ const Profile = () => {
             setUser(res.data.user);
             setIsEditing(false);
             setFormData({ ...formData, password: '' });
-            alert('Profil mis à jour avec succès');
+            alert(t('profile.update_success'));
         } catch (error) {
-            alert(error.response?.data?.error || 'Erreur lors de la mise à jour');
+            alert(error.response?.data?.error || t('profile.update_error'));
         }
     };
 
@@ -44,8 +46,8 @@ const Profile = () => {
             <main className="main-content">
                 <header className="page-header">
                     <div>
-                        <h1>Mon Profil</h1>
-                        <p>Consultez et modifiez vos informations personnelles.</p>
+                        <h1>{t('profile.my_profile')}</h1>
+                        <p>{t('profile.subtitle')}</p>
                     </div>
                 </header>
 
@@ -59,9 +61,9 @@ const Profile = () => {
                                 <div>
                                     <h2 className="text-2xl font-bold text-slate-800">{user.name}</h2>
                                     <span className={`role-badge ${user.role} mt-2 inline-block`}>
-                                        {user.role === 'student' ? 'Étudiant' :
-                                            user.role === 'formateur' ? 'Formateur' :
-                                                user.role === 'Responsable' ? 'Responsable' : 'Administrateur'}
+                                        {user.role === 'student' ? t('sidebar.student') :
+                                            user.role === 'formateur' ? t('sidebar.formateur') :
+                                                user.role === 'Responsable' ? t('sidebar.responsable') : t('sidebar.admin')}
                                     </span>
                                 </div>
                             </div>
@@ -70,7 +72,7 @@ const Profile = () => {
                                     onClick={() => setIsEditing(true)}
                                     className="btn-primary"
                                 >
-                                    ✏️ Modifier
+                                    ✏️ {t('common.edit')}
                                 </button>
                             )}
                         </div>
@@ -78,7 +80,7 @@ const Profile = () => {
                         {isEditing ? (
                             <form onSubmit={handleSubmit} className="grid gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nom Complet</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">{t('profile.full_name')}</label>
                                     <input
                                         type="text"
                                         className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -89,7 +91,7 @@ const Profile = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Adresse Email</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">{t('profile.email')}</label>
                                     <input
                                         type="email"
                                         className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -100,43 +102,43 @@ const Profile = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nouveau Mot de Passe (optionnel)</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">{t('profile.new_password')}</label>
                                     <input
                                         type="password"
                                         className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                        placeholder="Laissez vide pour ne pas changer"
+                                        placeholder={t('profile.password_hint')}
                                     />
                                 </div>
 
                                 <div className="flex gap-3 mt-4">
                                     <button type="button" onClick={handleCancel} className="flex-1 btn-secondary">
-                                        Annuler
+                                        {t('common.cancel')}
                                     </button>
                                     <button type="submit" className="flex-1 btn-primary justify-center">
-                                        Enregistrer
+                                        {t('common.save')}
                                     </button>
                                 </div>
                             </form>
                         ) : (
                             <div className="grid gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-500 mb-1">Nom Complet</label>
+                                    <label className="block text-sm font-medium text-slate-500 mb-1">{t('profile.full_name')}</label>
                                     <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium">
                                         {user.name}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-500 mb-1">Adresse Email</label>
+                                    <label className="block text-sm font-medium text-slate-500 mb-1">{t('profile.email')}</label>
                                     <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium">
                                         {user.email}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-500 mb-1">Statut du Compte</label>
+                                    <label className="block text-sm font-medium text-slate-500 mb-1">{t('profile.account_status')}</label>
                                     <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800">
                                         <span className={`w-2.5 h-2.5 rounded-full ${user.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}></span>
                                         <span className="font-medium capitalize">{user.status}</span>

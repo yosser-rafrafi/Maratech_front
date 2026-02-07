@@ -235,13 +235,13 @@ const Signup = () => {
 
                         <div className="mt-auto lg:mt-12 pt-8 border-t border-slate-100 w-full">
                             <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-400 font-bold mb-4">
-                                <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Support</a>
-                                <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Policies</a>
-                                <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Compliance</a>
+                                <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.support')}</a>
+                                <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.policies')}</a>
+                                <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.compliance')}</a>
                             </div>
                             <p className="text-[10px] text-center text-slate-400 uppercase tracking-[0.2em] leading-relaxed font-bold">
-                                © 2024 ASTBA. Science & Technology Business Association.
-                                <span className="block mt-1 text-slate-300">Global Certification Standard v2.4.0</span>
+                                {t('common.footer.copyright')}
+                                <span className="block mt-1 text-slate-300">{t('common.footer.version')}</span>
                             </p>
                         </div>
                     </div>

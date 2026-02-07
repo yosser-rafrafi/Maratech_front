@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const Successful = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { t } = useTranslation();
     const mascotHeadRef = useRef(null);
     const eyeLeftRef = useRef(null);
     const eyeRightRef = useRef(null);
@@ -208,7 +210,7 @@ const Successful = () => {
                             {/* Speech Bubble */}
                             <div className="speech-bubble absolute left-[105%] top-1/2 -translate-y-1/2 px-6 py-4 rounded-2xl whitespace-nowrap">
                                 <p className="text-slate-900 font-extrabold text-xl tracking-tight flex items-center gap-2">
-                                    Welcome back!
+                                    {t('successful.welcome_back', { defaultValue: 'Welcome back!' })}
                                     <span className="material-symbols-outlined text-green-500 fill-1">verified</span>
                                 </p>
                             </div>
@@ -245,10 +247,10 @@ const Successful = () => {
                         </div>
 
                         <div className="max-w-sm">
-                            <h2 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">Authentication Successful</h2>
+                            <h2 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">{t('successful.title', { defaultValue: 'Authentication Successful' })}</h2>
                             <p className="text-lg text-slate-500 leading-relaxed">
-                                Redirecting to your dashboard... <br />
-                                <span className="font-bold text-green-500">Secure session established.</span>
+                                {t('successful.redirecting', { defaultValue: 'Redirecting to your dashboard...' })} <br />
+                                <span className="font-bold text-green-500">{t('successful.session_established', { defaultValue: 'Secure session established.' })}</span>
                             </p>
                         </div>
 
@@ -263,13 +265,13 @@ const Successful = () => {
                     {/* Footer */}
                     <div className="mt-12 pt-8 border-t border-slate-100 w-full">
                         <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-400 font-bold mb-6">
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Support</a>
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Policies</a>
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Compliance</a>
+                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.support')}</a>
+                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.policies')}</a>
+                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.compliance')}</a>
                         </div>
                         <p className="text-[11px] text-center text-slate-400 uppercase tracking-[0.2em] leading-relaxed font-bold">
-                            © 2024 ASTBA. Science & Technology Business Association.
-                            <span className="block mt-1 text-slate-300">Global Certification Standard v2.4.0</span>
+                            {t('common.footer.copyright')}
+                            <span className="block mt-1 text-slate-300">{t('common.footer.version')}</span>
                         </p>
                     </div>
                 </div>

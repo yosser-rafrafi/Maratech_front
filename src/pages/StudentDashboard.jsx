@@ -286,10 +286,41 @@ const StudentDashboard = () => {
                                             </div>
                                         </div>
 
-                                        <Link to={`/student-session/${nextSession.id}`} className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
-                                            View Details
-                                            <span className="material-symbols-outlined text-xl">arrow_outward</span>
-                                        </Link>
+                                        <h4 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors">
+                                            {session.title}
+                                        </h4>
+                                        <p className="text-slate-500 text-sm mb-6 line-clamp-2">
+                                            {session.description || 'Session de formation pratique et théorique.'}
+                                        </p>
+
+                                        <div className="space-y-3 mb-6">
+                                            <div className="flex items-center gap-3 text-slate-600">
+                                                <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+                                                    <span className="material-symbols-outlined text-sm">schedule</span>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-slate-400 font-medium">{t('student_dashboard.date_time')}</p>
+                                                    <p className="text-sm font-semibold">
+                                                        {new Date(session.date).toLocaleDateString()} • {session.startTime} - {session.endTime}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3 text-slate-600">
+                                                <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                                    <span className="material-symbols-outlined text-sm">person</span>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-slate-400 font-medium">{t('student_dashboard.trainer')}</p>
+                                                    <p className="text-sm font-semibold">{session.formateur}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button className="w-full py-2.5 rounded-xl bg-slate-50 text-slate-600 font-medium hover:bg-blue-600 hover:text-white transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-blue-200">
+                                            <span>{t('student_dashboard.view_details')}</span>
+                                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                        </button>
                                     </div>
                                 ) : (
                                     <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 text-center text-slate-400 italic border border-dashed border-slate-200 dark:border-slate-800">

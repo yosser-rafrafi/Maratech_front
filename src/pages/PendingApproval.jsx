@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const PendingApproval = () => {
+    const { t } = useTranslation();
     const mascotHeadRef = useRef(null);
     const eyeLeftRef = useRef(null);
     const eyeRightRef = useRef(null);
@@ -171,10 +173,10 @@ const PendingApproval = () => {
                             <div className="speech-bubble absolute left-[105%] top-1/2 -translate-y-1/2 px-6 py-4 rounded-2xl w-[240px]">
                                 <div className="flex flex-col">
                                     <p className="text-slate-900 font-extrabold text-xl tracking-tight leading-tight">
-                                        Your request isn't
+                                        {t('pending.speech_line1', { defaultValue: "Your request isn't" })}
                                     </p>
                                     <p className="text-slate-900 font-extrabold text-xl tracking-tight leading-tight">
-                                        approved yet!
+                                        {t('pending.speech_line2', { defaultValue: 'approved yet!' })}
                                     </p>
                                 </div>
                             </div>
@@ -203,35 +205,35 @@ const PendingApproval = () => {
                             <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-3xl mb-6">
                                 <span className="material-symbols-outlined text-5xl text-primary font-light">schedule</span>
                             </div>
-                            <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Compte en attente d'approbation</h2>
+                            <h2 className="text-3xl font-extrabold text-slate-900 mb-4">{t('pending.title', { defaultValue: 'Account pending approval' })}</h2>
                             <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 text-left">
                                 <p className="text-slate-600 leading-relaxed mb-4">
-                                    Votre demande d'inscription a été reçue avec succès. Pour garantir la sécurité de notre plateforme, chaque compte doit être vérifié manuellement.
+                                    {t('pending.message1', { defaultValue: 'Your registration request has been received successfully. To ensure platform security, each account must be manually verified.' })}
                                 </p>
                                 <p className="text-slate-600 leading-relaxed">
-                                    Un administrateur examine actuellement vos informations. Vous recevrez un e-mail de confirmation dès que votre accès sera activé.
+                                    {t('pending.message2', { defaultValue: 'An administrator is currently reviewing your information. You will receive a confirmation email once your access is activated.' })}
                                 </p>
                             </div>
                         </div>
                         <div className="flex flex-col gap-4">
                             <Link to="/login" className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-slate-200 transition-all flex items-center justify-center gap-2 group">
                                 <span className="material-symbols-outlined text-xl transition-transform group-hover:-translate-x-1">arrow_back</span>
-                                Retour à la connexion
+                                {t('pending.back_to_login', { defaultValue: 'Back to login' })}
                             </Link>
                             <p className="text-center text-slate-500 text-sm mt-4">
-                                Besoin d'aide ? <a className="text-primary font-bold hover:underline" href="#">Contacter le support</a>
+                                {t('pending.need_help', { defaultValue: 'Need help?' })} <a className="text-primary font-bold hover:underline" href="#">{t('common.footer.support')}</a>
                             </p>
                         </div>
                     </div>
                     <div className="mt-12 pt-8 border-t border-slate-100">
                         <div className="flex flex-wrap gap-6 text-sm text-slate-400 font-bold mb-6">
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Support</a>
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Policies</a>
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Compliance</a>
+                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.support')}</a>
+                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.policies')}</a>
+                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.compliance')}</a>
                         </div>
                         <p className="text-[11px] text-slate-400 uppercase tracking-[0.2em] leading-relaxed font-bold">
-                            © 2024 ASTBA. Science & Technology Business Association.
-                            <span className="block mt-1 text-slate-300">Global Certification Standard v2.4.0</span>
+                            {t('common.footer.copyright')}
+                            <span className="block mt-1 text-slate-300">{t('common.footer.version')}</span>
                         </p>
                     </div>
                 </div>

@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -11,6 +12,13 @@ const Sidebar = () => {
     const changeLanguage = (lng) => {
         i18n.changeLanguage(lng);
     };
+
+    // Handle RTL direction based on language
+    useEffect(() => {
+        const dir = (i18n.language === 'ar' || i18n.language === 'tn') ? 'rtl' : 'ltr';
+        document.documentElement.dir = dir;
+        document.documentElement.lang = i18n.language;
+    }, [i18n.language]);
 
     const isAdmin = user?.role === 'admin';
     const isFormateur = user?.role === 'formateur';
@@ -99,21 +107,26 @@ const Sidebar = () => {
                     </div>
                 ))}
             </nav>
-
             <div className="sidebar-footer">
-                <div className="language-switcher mb-4 flex gap-2 px-4 justify-center">
-                    <button
-                        onClick={() => changeLanguage('fr')}
-                        className={`lang-btn ${i18n.language.startsWith('fr') ? 'active' : ''}`}
-                    >
-                        FR
-                    </button>
-                    <button
-                        onClick={() => changeLanguage('en')}
-                        className={`lang-btn ${i18n.language.startsWith('en') ? 'active' : ''}`}
-                    >
-                        EN
-                    </button>
+                <div className="language-switcher">
+                    <div className="lang-grid">
+                        {[
+                            { code: 'fr', label: '🇫🇷 FR' },
+                            { code: 'en', label: '🇬🇧 EN' },
+                            { code: 'ar', label: '🇸🇦 AR' },
+                            { code: 'tn', label: '🇹🇳 TN' },
+                            { code: 'de', label: '🇩🇪 DE' },
+                            { code: 'zh', label: '🇨🇳 ZH' }
+                        ].map(lang => (
+                            <button
+                                key={lang.code}
+                                onClick={() => changeLanguage(lang.code)}
+                                className={`lang-btn ${i18n.language === lang.code ? 'active' : ''}`}
+                            >
+                                {lang.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
                 <button onClick={logout} className="logout-btn">
                     <span className="material-symbols-outlined">logout</span>
