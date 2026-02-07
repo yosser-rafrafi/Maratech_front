@@ -1,252 +1,203 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
+import Sidebar from '../components/Sidebar';
 import './Dashboard.css';
 
 const AdminDashboard = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-
+    const { user } = useAuth();
+    const [users, setUsers] = useState([]);
     const [formations, setFormations] = useState([]);
-    const [sessions, setSessions] = useState([]);
-    const [showFormationForm, setShowFormationForm] = useState(false);
-    const [showSessionForm, setShowSessionForm] = useState(false);
-    const [formationData, setFormationData] = useState({ title: '', description: '', duration: '' });
-    const [sessionData, setSessionData] = useState({
-        formation: '', date: '', startTime: '', endTime: '', formateur: '', maxParticipants: 30
-    });
-    const [editingFormation, setEditingFormation] = useState(null);
+    const [userData, setUserData] = useState({ name: '', email: '', password: '', role: 'formateur' });
+    const [editingUser, setEditingUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('users'); // 'users' or 'certifications'
 
     useEffect(() => {
+        fetchUsers();
         fetchFormations();
-        fetchSessions();
     }, []);
+
+    const fetchUsers = async () => {
+        try {
+            const res = await api.get('/admin/users');
+            setUsers(res.data.users);
+            setLoading(false);
+        } catch (err) {
+            console.error(err);
+            setLoading(false);
+        }
+    };
 
     const fetchFormations = async () => {
         try {
-            const response = await api.get('/formations');
-            setFormations(response.data.formations);
-        } catch (error) {
-            console.error('Error fetching formations:', error);
-        }
+            const res = await api.get('/formations');
+            setFormations(res.data.formations);
+        } catch (err) { console.error(err); }
     };
 
-    const fetchSessions = async () => {
-        try {
-            const response = await api.get('/sessions');
-            setSessions(response.data.sessions);
-        } catch (error) {
-            console.error('Error fetching sessions:', error);
-        }
-    };
-
-    const handleFormationSubmit = async (e) => {
+    const handleUserSubmit = async (e) => {
         e.preventDefault();
         try {
-            if (editingFormation) {
-                await api.put(`/formations/${editingFormation}`, formationData);
+            if (editingUser) {
+                await api.put(`/admin/users/${editingUser}`, userData);
             } else {
-                await api.post('/formations', formationData);
+                await api.post('/admin/users', userData);
             }
-            setFormationData({ title: '', description: '', duration: '' });
-            setShowFormationForm(false);
-            setEditingFormation(null);
-            fetchFormations();
+            setUserData({ name: '', email: '', password: '', role: 'formateur' });
+            setEditingUser(null);
+            fetchUsers();
         } catch (error) {
-            alert(error.response?.data?.error || 'Error saving formation');
+            alert(error.response?.data?.error || 'Error saving user');
         }
     };
 
-    const handleSessionSubmit = async (e) => {
-        e.preventDefault();
+    const generateCertificate = async (userId, formationId) => {
         try {
-            await api.post('/sessions', sessionData);
-            setSessionData({ formation: '', date: '', startTime: '', endTime: '', formateur: '', maxParticipants: 30 });
-            setShowSessionForm(false);
-            fetchSessions();
+            // Check eligibility first
+            const eligibleRes = await api.get(`/admin/certification/eligible/${userId}/${formationId}`);
+            if (!eligibleRes.data.eligible) {
+                return alert(`Inéligible: ${eligibleRes.data.reason}`);
+            }
+
+            if (window.confirm('Générer le certificat pour cet utilisateur ?')) {
+                await api.post('/admin/certification/generate', { userId, formationId });
+                alert('Certificat généré avec succès !');
+            }
         } catch (error) {
-            alert(error.response?.data?.error || 'Error creating session');
+            alert(error.response?.data?.error || 'Erreur lors de la génération');
         }
-    };
-
-    const deleteFormation = async (id) => {
-        if (window.confirm('Are you sure you want to delete this formation?')) {
-            try {
-                await api.delete(`/formations/${id}`);
-                fetchFormations();
-            } catch (error) {
-                alert(error.response?.data?.error || 'Error deleting formation');
-            }
-        }
-    };
-
-    const deleteSession = async (id) => {
-        if (window.confirm('Are you sure you want to delete this session?')) {
-            try {
-                await api.delete(`/sessions/${id}`);
-                fetchSessions();
-            } catch (error) {
-                alert(error.response?.data?.error || 'Error deleting session');
-            }
-        }
-    };
-
-    const editFormation = (formation) => {
-        setFormationData({
-            title: formation.title,
-            description: formation.description,
-            duration: formation.duration
-        });
-        setEditingFormation(formation._id);
-        setShowFormationForm(true);
-    };
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
     };
 
     return (
-        <div className="dashboard">
-            <header className="dashboard-header">
-                <div>
-                    <h1>Admin Dashboard</h1>
-                    <p>Welcome, {user?.name}</p>
+        <div className="dashboard-layout">
+            <Sidebar />
+
+            <main className="main-content">
+                <header className="page-header">
+                    <div>
+                        <h1>Espace Administratif</h1>
+                        <p>Gestion des utilisateurs et certifications.</p>
+                    </div>
+                    <div className="header-tabs">
+                        <button
+                            className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('users')}
+                        >Utilisateurs</button>
+                        <button
+                            className={`tab-btn ${activeTab === 'certifications' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('certifications')}
+                        >Certifications</button>
+                    </div>
+                </header>
+
+                <div className="dashboard-grid">
+                    {activeTab === 'users' ? (
+                        <>
+                            <section className="dashboard-section">
+                                <div className="section-header">
+                                    <h2>{editingUser ? 'Modifier Utilisateur' : 'Nouvel Utilisateur'}</h2>
+                                </div>
+                                <form onSubmit={handleUserSubmit} className="form-card">
+                                    <input
+                                        type="text"
+                                        placeholder="Nom complet"
+                                        value={userData.name}
+                                        onChange={(e) => setUserData({ ...userData, name: e.target.value })}
+                                        required
+                                    />
+                                    <input
+                                        type="email"
+                                        placeholder="Email"
+                                        value={userData.email}
+                                        onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                                        required
+                                    />
+                                    {!editingUser && (
+                                        <input
+                                            type="password"
+                                            placeholder="Mot de passe"
+                                            value={userData.password}
+                                            onChange={(e) => setUserData({ ...userData, password: e.target.value })}
+                                            required
+                                        />
+                                    )}
+                                    <select
+                                        value={userData.role}
+                                        onChange={(e) => setUserData({ ...userData, role: e.target.value })}
+                                    >
+                                        <option value="formateur">Formateur</option>
+                                        <option value="Responsable">Responsable Formation</option>
+                                        <option value="admin">Administratif</option>
+                                    </select>
+                                    <button type="submit" className="btn-primary">
+                                        {editingUser ? 'Mettre à jour' : 'Créer Profil'}
+                                    </button>
+                                    {editingUser && (
+                                        <button type="button" className="btn-secondary" onClick={() => {
+                                            setEditingUser(null);
+                                            setUserData({ name: '', email: '', password: '', role: 'formateur' });
+                                        }}>Annuler</button>
+                                    )}
+                                </form>
+                            </section>
+
+                            <section className="dashboard-section">
+                                <h2>Liste des Utilisateurs</h2>
+                                <div className="table-container">
+                                    <table className="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Nom</th>
+                                                <th>Email</th>
+                                                <th>Rôle</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {users.map(u => (
+                                                <tr key={u._id}>
+                                                    <td>{u.name}</td>
+                                                    <td>{u.email}</td>
+                                                    <td><span className={`role-badge ${u.role}`}>{u.role}</span></td>
+                                                    <td>
+                                                        <button className="btn-icon" onClick={() => {
+                                                            setEditingUser(u._id);
+                                                            setUserData({ name: u.name, email: u.email, role: u.role });
+                                                        }}>✏️</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </>
+                    ) : (
+                        <section className="dashboard-section full-width">
+                            <h2>Éligibilité à la Certification</h2>
+                            <p>Associez un utilisateur à une formation pour vérifier son éligibilité.</p>
+                            <div className="certification-checker form-card">
+                                <div className="checker-fields">
+                                    <select id="cert-user">
+                                        <option value="">Sélectionner Utilisateur</option>
+                                        {users.map(u => <option key={u._id} value={u._id}>{u.name} ({u.role})</option>)}
+                                    </select>
+                                    <select id="cert-formation">
+                                        <option value="">Sélectionner Formation</option>
+                                        {formations.map(f => <option key={f._id} value={f._id}>{f.title}</option>)}
+                                    </select>
+                                    <button className="btn-primary" onClick={() => {
+                                        const userId = document.getElementById('cert-user').value;
+                                        const formationId = document.getElementById('cert-formation').value;
+                                        if (userId && formationId) generateCertificate(userId, formationId);
+                                    }}>Vérifier & Générer</button>
+                                </div>
+                            </div>
+                        </section>
+                    )}
                 </div>
-                <button onClick={handleLogout} className="btn-logout">Logout</button>
-            </header>
-
-            <div className="dashboard-content">
-                {/* Formations Section */}
-                <section className="dashboard-section">
-                    <div className="section-header">
-                        <h2>Formations</h2>
-                        <button onClick={() => setShowFormationForm(!showFormationForm)} className="btn-add">
-                            {showFormationForm ? 'Cancel' : '+ Add Formation'}
-                        </button>
-                    </div>
-
-                    {showFormationForm && (
-                        <form onSubmit={handleFormationSubmit} className="form-card">
-                            <input
-                                type="text"
-                                placeholder="Formation Title"
-                                value={formationData.title}
-                                onChange={(e) => setFormationData({ ...formationData, title: e.target.value })}
-                                required
-                            />
-                            <textarea
-                                placeholder="Description"
-                                value={formationData.description}
-                                onChange={(e) => setFormationData({ ...formationData, description: e.target.value })}
-                                required
-                            />
-                            <input
-                                type="number"
-                                placeholder="Duration (hours)"
-                                value={formationData.duration}
-                                onChange={(e) => setFormationData({ ...formationData, duration: e.target.value })}
-                                required
-                                min="1"
-                            />
-                            <button type="submit" className="btn-submit">
-                                {editingFormation ? 'Update Formation' : 'Create Formation'}
-                            </button>
-                        </form>
-                    )}
-
-                    <div className="cards-grid">
-                        {formations.map((formation) => (
-                            <div key={formation._id} className="card">
-                                <h3>{formation.title}</h3>
-                                <p>{formation.description}</p>
-                                <p className="card-meta">Duration: {formation.duration} hours</p>
-                                <p className="card-meta">Created by: {formation.createdBy?.name}</p>
-                                <div className="card-actions">
-                                    <button onClick={() => editFormation(formation)} className="btn-edit">Edit</button>
-                                    <button onClick={() => deleteFormation(formation._id)} className="btn-delete">Delete</button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Sessions Section */}
-                <section className="dashboard-section">
-                    <div className="section-header">
-                        <h2>Sessions</h2>
-                        <button onClick={() => setShowSessionForm(!showSessionForm)} className="btn-add">
-                            {showSessionForm ? 'Cancel' : '+ Add Session'}
-                        </button>
-                    </div>
-
-                    {showSessionForm && (
-                        <form onSubmit={handleSessionSubmit} className="form-card">
-                            <select
-                                value={sessionData.formation}
-                                onChange={(e) => setSessionData({ ...sessionData, formation: e.target.value })}
-                                required
-                            >
-                                <option value="">Select Formation</option>
-                                {formations.map((f) => (
-                                    <option key={f._id} value={f._id}>{f.title}</option>
-                                ))}
-                            </select>
-                            <input
-                                type="date"
-                                value={sessionData.date}
-                                onChange={(e) => setSessionData({ ...sessionData, date: e.target.value })}
-                                required
-                            />
-                            <input
-                                type="time"
-                                placeholder="Start Time"
-                                value={sessionData.startTime}
-                                onChange={(e) => setSessionData({ ...sessionData, startTime: e.target.value })}
-                                required
-                            />
-                            <input
-                                type="time"
-                                placeholder="End Time"
-                                value={sessionData.endTime}
-                                onChange={(e) => setSessionData({ ...sessionData, endTime: e.target.value })}
-                                required
-                            />
-                            <input
-                                type="text"
-                                placeholder="Formateur ID"
-                                value={sessionData.formateur}
-                                onChange={(e) => setSessionData({ ...sessionData, formateur: e.target.value })}
-                                required
-                            />
-                            <input
-                                type="number"
-                                placeholder="Max Participants"
-                                value={sessionData.maxParticipants}
-                                onChange={(e) => setSessionData({ ...sessionData, maxParticipants: e.target.value })}
-                                min="1"
-                            />
-                            <button type="submit" className="btn-submit">Create Session</button>
-                        </form>
-                    )}
-
-                    <div className="cards-grid">
-                        {sessions.map((session) => (
-                            <div key={session._id} className="card">
-                                <h3>{session.formation?.title}</h3>
-                                <p className="card-meta">Date: {new Date(session.date).toLocaleDateString()}</p>
-                                <p className="card-meta">Time: {session.startTime} - {session.endTime}</p>
-                                <p className="card-meta">Formateur: {session.formateur?.name}</p>
-                                <p className="card-meta">Participants: {session.participants?.length}/{session.maxParticipants}</p>
-                                <div className="card-actions">
-                                    <button onClick={() => deleteSession(session._id)} className="btn-delete">Delete</button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            </div>
+            </main>
         </div>
     );
 };

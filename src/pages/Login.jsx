@@ -1,82 +1,90 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const { login } = useAuth();
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { login } = useAuth();
-    const navigate = useNavigate();
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
-        const result = await login(email, password);
-
-        if (result.success) {
+        try {
+            const user = await login(formData.email, formData.password);
             // Redirect based on role
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user.role === 'admin') {
-                navigate('/admin');
-            } else if (user.role === 'formateur') {
-                navigate('/formateur');
-            } else {
-                navigate('/participant');
-            }
-        } else {
-            setError(result.error);
+            if (user.role === 'admin') navigate('/admin');
+            else if (user.role === 'formateur') navigate('/formateur');
+            else navigate('/participant');
+        } catch (err) {
+            setError(err.response?.data?.error || 'Failed to login');
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
-                <h1>Login</h1>
-                <p className="auth-subtitle">Welcome back to ASTBA Training</p>
+        <div className="auth-page">
+            <div className="auth-visual">
+                <div className="visual-content">
+                    <h2>Bienvenue sur ASTBA</h2>
+                    <p>La plateforme de gestion de formation maritime nouvelle génération. Accédez à vos cours, votre planning et votre suivi en un clic.</p>
+                </div>
+            </div>
 
-                {error && <div className="error-message">{error}</div>}
+            <div className="auth-form-container">
+                <div className="auth-card">
+                    <h1>Se connecter</h1>
+                    <p className="auth-subtitle">Content de vous revoir sur la plateforme.</p>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            placeholder="Enter your email"
-                        />
+                    {error && <div className="error-message">{error}</div>}
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>Adresse e-mail</label>
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="nom@exemple.com"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Mot de passe</label>
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="••••••••"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <button type="submit" className="btn-auth" disabled={loading}>
+                            {loading ? 'Connexion...' : 'Se connecter'}
+                        </button>
+                    </form>
+
+                    <div className="auth-footer">
+                        Pas encore de compte ? <Link to="/signup">Créer un compte</Link>
                     </div>
-
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            placeholder="Enter your password"
-                        />
-                    </div>
-
-                    <button type="submit" className="btn-primary" disabled={loading}>
-                        {loading ? 'Logging in...' : 'Login'}
-                    </button>
-                </form>
-
-                <p className="auth-footer">
-                    Don't have an account? <Link to="/signup">Sign up</Link>
-                </p>
+                </div>
             </div>
         </div>
     );
