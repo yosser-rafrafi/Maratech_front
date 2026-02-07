@@ -6,6 +6,8 @@ import Signup from './pages/Signup';
 import AdminDashboard from './pages/AdminDashboard';
 import FormateurDashboard from './pages/FormateurDashboard';
 import ParticipantDashboard from './pages/ParticipantDashboard';
+import Successful from './pages/Successful';
+import Unsuccessful from './pages/Unsuccessful';
 import './App.css';
 
 // Home redirect component
@@ -62,6 +64,8 @@ function App() {
             }
           />
 
+          <Route path="/success" element={<Successful />} />
+          <Route path="/unsuccessful" element={<Unsuccessful />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>

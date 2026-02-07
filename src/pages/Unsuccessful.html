@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ASTBA Platform Login | Error State</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "error": "#ef4444",
+                        "tech-navy": "#020617",
+                        "accent-blue": "#0ea5e9",
+                        "glow-red": "#f87171",
+                        "background-light": "#f8fafc",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1.25rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+            }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tech-bg {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(239, 68, 68, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+        .grid-intersection {
+            background-image: radial-gradient(circle at 50% 50%, #ef4444 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.1;
+        }
+        .circuit-trace {
+            stroke: #450a0a;
+            stroke-width: 1;
+            fill: none;
+            opacity: 0.2;
+        }
+        .hologram-icon {
+            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.4));
+        }
+        .bemo-head-container {
+            perspective: 1000px;
+        }
+        .robot-head-textured {
+            background: linear-gradient(145deg, #ffffff 0%, #cbd5e1 100%);
+            box-shadow: 
+                inset -5px -5px 15px rgba(0,0,0,0.1),
+                inset 5px 5px 15px rgba(239, 68, 68, 0.1),
+                0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        .robot-face-glow {
+            background: #0f172a;
+            box-shadow: inset 0 0 25px rgba(239, 68, 68, 0.2);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+        }
+        .robot-eye-sad {
+            background: #f87171;
+            box-shadow: 0 0 15px #ef4444, 0 0 30px rgba(239, 68, 68, 0.4);
+            clip-path: polygon(0% 100%, 100% 100%, 100% 40%, 0% 0%);
+            transform: rotate(5deg);
+        }
+        .robot-eye-sad-right {
+            background: #f87171;
+            box-shadow: 0 0 15px #ef4444, 0 0 30px rgba(239, 68, 68, 0.4);
+            clip-path: polygon(0% 100%, 100% 100%, 100% 0%, 0% 40%);
+            transform: rotate(-5deg);
+        }
+        .robot-digital-flat-mouth {
+            width: 24px;
+            height: 2px;
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+            opacity: 0.9;
+        }
+        .speech-bubble {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border: 2px solid #ef4444;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2), 0 0 15px rgba(239, 68, 68, 0.3);
+        }
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 12px solid #ef4444;
+        }
+        .red-error-glow {
+            background: radial-gradient(circle at 30% 50%, rgba(239, 68, 68, 0.15) 0%, transparent 60%);
+        }
+    </style>
+</head>
+<body class="bg-background-light min-h-screen flex items-center justify-center font-display overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<div class="hidden lg:flex lg:w-3/5 relative overflow-hidden tech-bg">
+<div class="absolute inset-0 red-error-glow"></div>
+<div class="absolute inset-0 grid-intersection"></div>
+<svg class="absolute inset-0 w-full h-full opacity-40" xmlns="http://www.w3.org/2000/svg">
+<path class="circuit-trace" d="M0 100 H200 L250 150 V300 L300 350 H600"></path>
+<path class="circuit-trace" d="M1000 800 H800 L750 750 V600 L700 550 H400"></path>
+<circle cx="200" cy="100" fill="#ef4444" opacity="0.3" r="3"></circle>
+<circle cx="600" cy="350" fill="#ef4444" opacity="0.3" r="3"></circle>
+</svg>
+<div class="absolute top-[15%] left-[15%] hologram-icon text-error opacity-20">
+<span class="material-symbols-outlined !text-6xl">biotech</span>
+</div>
+<div class="absolute bottom-[20%] right-[15%] hologram-icon text-error opacity-20">
+<span class="material-symbols-outlined !text-7xl">security</span>
+</div>
+<div class="relative z-10 flex flex-col items-center justify-center w-full p-20 text-white">
+<div class="bemo-head-container relative mb-16 flex items-center">
+<div class="bemo-bot-head relative w-64 h-56" id="mascot">
+<div class="robot-head-textured w-64 h-56 rounded-[3.5rem] relative z-20 flex items-center justify-center" id="mascot-head">
+<div class="robot-face-glow w-48 h-36 rounded-[2.5rem] flex flex-col items-center justify-center gap-6 relative overflow-hidden">
+<div class="flex gap-10 mt-2">
+<div class="robot-eye-sad w-12 h-8 rounded-sm" id="eye-left"></div>
+<div class="robot-eye-sad-right w-12 h-8 rounded-sm" id="eye-right"></div>
+</div>
+<div class="robot-digital-flat-mouth mb-1" id="digital-mouth"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-red-400/5 to-transparent h-1/3 w-full opacity-50"></div>
+</div>
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 flex gap-16">
+<div class="w-3 h-8 bg-slate-300 rounded-full border-b-4 border-error/50"></div>
+<div class="w-3 h-8 bg-slate-300 rounded-full border-b-4 border-error/50"></div>
+</div>
+</div>
+<div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-40 h-8 bg-error/10 rounded-full blur-2xl"></div>
+</div>
+<div class="speech-bubble absolute left-[105%] top-1/2 -translate-y-1/2 px-6 py-4 rounded-2xl w-[240px]">
+<div class="flex flex-col gap-1">
+<p class="text-slate-900 font-extrabold text-xl tracking-tight leading-tight">
+                            Access Denied.
+                        </p>
+<p class="text-slate-900 font-extrabold text-xl tracking-tight leading-tight flex items-center gap-2">
+                            Let's try that again!
+                            <span class="material-symbols-outlined text-error text-xl">warning</span>
+</p>
+</div>
+</div>
+</div>
+<div class="text-center relative">
+<div class="flex items-center justify-center gap-4 mb-4">
+<div class="bg-error/10 p-3 rounded-2xl backdrop-blur-md border border-error/20">
+<span class="material-symbols-outlined text-4xl text-error">rocket_launch</span>
+</div>
+<h1 class="text-6xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-red-200">ASTBA</h1>
+</div>
+<p class="text-xl font-medium max-w-md mx-auto leading-relaxed text-red-100/60">
+                    Advancing Science and Technology Business Administration.
+                </p>
+</div>
+</div>
+</div>
+<div class="w-full lg:w-2/5 flex flex-col bg-white p-8 md:p-16 lg:p-20 justify-between">
+<div class="w-full max-w-sm mx-auto flex-1 flex flex-col justify-center">
+<div class="flex items-center gap-3 lg:hidden mb-12 text-error">
+<span class="material-symbols-outlined text-4xl">rocket_launch</span>
+<span class="text-3xl font-black tracking-tight text-slate-900">ASTBA</span>
+</div>
+<div class="mb-8 flex items-center gap-3 bg-red-50 border border-red-200 p-4 rounded-xl text-red-600 animate-in fade-in slide-in-from-top-4 duration-300">
+<span class="material-symbols-outlined">error</span>
+<span class="font-bold text-sm">Invalid credentials</span>
+</div>
+<div class="mb-10">
+<h2 class="text-3xl font-extrabold text-slate-900 mb-2">Welcome Back</h2>
+<p class="text-slate-500">Enter your credentials to access your dashboard.</p>
+</div>
+<form class="space-y-6" onsubmit="return false;">
+<div class="space-y-2">
+<label class="text-sm font-bold text-slate-700 uppercase tracking-wider" for="email">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">mail</span>
+<input class="w-full pl-12 pr-4 py-4 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 placeholder:text-slate-400" id="email" placeholder="name@organization.edu" type="email" value="user@astba.org"/>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="text-sm font-bold text-slate-700 uppercase tracking-wider" for="password">Password</label>
+<a class="text-sm font-bold text-error hover:text-red-700 transition-colors underline underline-offset-4" href="#">Forgot Password?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
+<input class="w-full pl-12 pr-4 py-4 bg-red-50 border-2 border-red-500 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-slate-900" id="password" type="password" value="wrongpassword"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<input class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary transition-all" id="remember" type="checkbox"/>
+<label class="text-sm font-medium text-slate-600 cursor-pointer" for="remember">Keep me signed in</label>
+</div>
+<button class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-slate-200 transition-all transform hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2" type="submit">
+                    Sign In to ASTBA
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</form>
+<div class="mt-8 text-center">
+<p class="text-slate-500 text-sm">Need access? <a class="text-primary font-bold hover:underline" href="#">Contact Administrator</a></p>
+</div>
+</div>
+<div class="mt-12 pt-8 border-t border-slate-100">
+<div class="flex flex-wrap gap-6 text-sm text-slate-400 font-bold mb-6">
+<a class="hover:text-primary transition-colors uppercase tracking-widest" href="#">Support</a>
+<a class="hover:text-primary transition-colors uppercase tracking-widest" href="#">Policies</a>
+<a class="hover:text-primary transition-colors uppercase tracking-widest" href="#">Compliance</a>
+</div>
+<p class="text-[11px] text-slate-400 uppercase tracking-[0.2em] leading-relaxed font-bold">
+                © 2024 ASTBA. Science &amp; Technology Business Association. 
+                <span class="block mt-1 text-slate-300">Global Certification Standard v2.4.0</span>
+</p>
+</div>
+</div>
+</div>
+<script>
+    const mascotHead = document.getElementById('mascot-head');
+    const eyeLeft = document.getElementById('eye-left');
+    const eyeRight = document.getElementById('eye-right');
+    const digitalMouth = document.getElementById('digital-mouth');
+    document.addEventListener('mousemove', (e) => {
+        const x = e.clientX;
+        const y = e.clientY;
+        const centerX = window.innerWidth * 0.3; 
+        const centerY = window.innerHeight / 2 - 100;
+        const deltaX = (x - centerX) / 40;
+        const deltaY = (y - centerY) / 40;
+        const rotX = Math.min(Math.max(-deltaY, -10), 10);
+        const rotY = Math.min(Math.max(deltaX, -15), 15);
+        mascotHead.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(30px)`;
+        const eyeX = Math.min(Math.max(deltaX / 2, -8), 8);
+        const eyeY = Math.min(Math.max(deltaY / 2, -4), 4);
+        eyeLeft.style.transform = `translate(${eyeX}px, ${eyeY}px)`;
+        eyeRight.style.transform = `translate(${eyeX}px, ${eyeY}px)`;
+        digitalMouth.style.transform = `translate(${eyeX * 0.6}px, ${eyeY * 0.6}px)`;
+    });
+    document.addEventListener('mouseleave', () => {
+        mascotHead.style.transform = `rotateX(0deg) rotateY(0deg) translateZ(0px)`;
+        eyeLeft.style.transform = `translate(0px, 0px)`;
+        eyeRight.style.transform = `translate(0px, 0px)`;
+        digitalMouth.style.transform = `translate(0px, 0px)`;
+    });
+</script>
+
+</body></html>

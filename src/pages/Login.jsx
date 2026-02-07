@@ -21,16 +21,10 @@ const Login = () => {
         const result = await login(email, password);
 
         if (result.success) {
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user.role === 'admin') {
-                navigate('/admin');
-            } else if (user.role === 'formateur') {
-                navigate('/formateur');
-            } else {
-                navigate('/participant');
-            }
+            navigate('/success');
         } else {
             setError(result.error);
+            navigate('/unsuccessful');
         }
 
         setLoading(false);
