@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import api from '../../config/api';
+import { useTranslation } from 'react-i18next';
 
 const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title = 'Gestion des États', showRoleFilter = true, onViewDetails }) => {
+    const { t } = useTranslation();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('all');
@@ -117,10 +119,10 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                             onChange={(e) => setFilterStatus(e.target.value)}
                             className="p-2 border rounded-lg text-sm"
                         >
-                            <option value="all">Tous les statuts</option>
-                            <option value="active">Actif</option>
-                            <option value="pending">En attente</option>
-                            <option value="suspended">Suspendu</option>
+                            <option value="all">{t('common.all_statuses', { defaultValue: 'Tous les statuts' })}</option>
+                            <option value="active">{t('attendance.present')}</option>
+                            <option value="pending">{t('dashboards.stats.pending_users')}</option>
+                            <option value="suspended">{t('common.suspend')}</option>
                         </select>
                     )}
 
@@ -130,8 +132,8 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                             onChange={(e) => setFilterRole(e.target.value)}
                             className="p-2 border rounded-lg text-sm"
                         >
-                            <option value="all">Tous les rôles</option>
-                            {allowedRoles.map(r => <option key={r} value={r}>{r}</option>)}
+                            <option value="all">{t('common.all_roles', { defaultValue: 'Tous les rôles' })}</option>
+                            {allowedRoles.map(r => <option key={r} value={r}>{t(`sidebar.${r}`, { defaultValue: r })}</option>)}
                         </select>
                     )}
 
@@ -143,7 +145,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                             setShowForm(true);
                         }}
                     >
-                        + Nouveau
+                        + {t('common.new', { defaultValue: 'Nouveau' })}
                     </button>
                 </div>
             </div>
@@ -153,13 +155,13 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                     className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${userTypeTab === 'staff' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
                     onClick={() => setUserTypeTab('staff')}
                 >
-                    {allowedRoles.includes('Responsable') ? '👥 Personnels (Resp./Form.)' : '👨‍🏫 Formateurs'}
+                    {allowedRoles.includes('Responsable') ? t('sidebar.personnel') : `👨‍🏫 ${t('sidebar.formateur')}s`}
                 </button>
                 <button
                     className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${userTypeTab === 'eleves' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
                     onClick={() => setUserTypeTab('eleves')}
                 >
-                    🎓 Élèves
+                    🎓 {t('dashboards.eleves')}
                 </button>
             </div>
             {showForm && (
@@ -232,10 +234,10 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                 <table className="w-full text-sm">
                     <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-xs">
                         <tr>
-                            <th className="p-4 text-left">Utilisateur</th>
-                            <th className="p-4 text-left">Rôle</th>
-                            {userTypeTab !== 'eleves' && <th className="p-4 text-left">Statut</th>}
-                            <th className="p-4 text-right">Actions</th>
+                            <th className="p-4 text-left">{t('common.user', { defaultValue: 'Utilisateur' })}</th>
+                            <th className="p-4 text-left">{t('common.role')}</th>
+                            {userTypeTab !== 'eleves' && <th className="p-4 text-left">{t('common.status')}</th>}
+                            <th className="p-4 text-right">{t('common.actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">

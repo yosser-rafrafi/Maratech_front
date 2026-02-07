@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const Login = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -91,8 +93,8 @@ const Login = () => {
                 navigate('/unsuccessful');
             } else if (result && result.id) {
                 // If result has an id, it's a user object (success)
-                console.log('Login successful, navigating to /success');
-                navigate('/success');
+                console.log('Login successful, navigating to home');
+                navigate('/');
             } else {
                 console.log('Unexpected result, navigating to /unsuccessful');
                 navigate('/unsuccessful');
@@ -242,19 +244,19 @@ const Login = () => {
                             <span className="text-3xl font-black tracking-tight text-slate-900">ASTBA</span>
                         </div>
                         <div className="mb-8 lg:mb-10">
-                            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Hello !<span className="wave">👋</span></h2>
-                            <p className="text-base md:text-lg text-slate-500">Welcome back to the ASTBA Portal.</p>
+                            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">{t('auth.hello', { defaultValue: 'Hello !' })} <span className="wave">👋</span></h2>
+                            <p className="text-base md:text-lg text-slate-500">{t('auth.login_welcome', { defaultValue: 'Welcome back to the ASTBA Portal.' })}</p>
                         </div>
 
                         <form className="space-y-5" onSubmit={handleSubmit}>
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Identification</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">{t('common.email')}</label>
                                 <div className="relative group">
                                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">account_circle</span>
                                     <input
                                         type="email"
                                         className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-base font-medium"
-                                        placeholder="Username or Email"
+                                        placeholder={t('auth.email_placeholder')}
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
@@ -262,13 +264,13 @@ const Login = () => {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Access Key</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">{t('common.password')}</label>
                                 <div className="relative group">
                                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">key</span>
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         className="w-full pl-12 pr-12 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-base font-medium"
-                                        placeholder="Password"
+                                        placeholder={t('auth.password_placeholder')}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
@@ -290,9 +292,9 @@ const Login = () => {
                                         checked={rememberMe}
                                         onChange={(e) => setRememberMe(e.target.checked)}
                                     />
-                                    <span className="text-sm font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">Remember me</span>
+                                    <span className="text-sm font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">{t('auth.remember_me')}</span>
                                 </label>
-                                <a className="text-sm font-bold text-primary hover:text-accent-blue transition-colors" href="#">Forgot Password?</a>
+                                <a className="text-sm font-bold text-primary hover:text-accent-blue transition-colors" href="#">{t('auth.forgot_password')}</a>
                             </div>
                             <button
                                 type="submit"
@@ -303,7 +305,7 @@ const Login = () => {
                                     <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                                 ) : (
                                     <>
-                                        <span>Log In</span>
+                                        <span>{t('auth.login_btn')}</span>
                                         <span className="material-symbols-outlined text-xl">arrow_forward</span>
                                     </>
                                 )}
@@ -312,8 +314,8 @@ const Login = () => {
 
                         <div className="mt-8 text-center">
                             <p className="text-sm text-slate-500">
-                                Not a member yet?
-                                <Link to="/signup" className="text-primary font-extrabold hover:underline underline-offset-4 ml-1">Request Access</Link>
+                                {t('auth.no_account')}
+                                <Link to="/signup" className="text-primary font-extrabold hover:underline underline-offset-4 ml-1">{t('auth.register')}</Link>
                             </p>
                         </div>
 

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import RobotMascot from '../components/RobotMascot';
 
 const Signup = () => {
     const { signup } = useAuth();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -26,7 +28,7 @@ const Signup = () => {
         setError('');
 
         if (formData.password !== formData.confirmPassword) {
-            return setError('Les mots de passe ne correspondent pas');
+            return setError(t('auth.password_mismatch'));
         }
 
         setLoading(true);
@@ -108,8 +110,8 @@ const Signup = () => {
                             <span className="text-3xl font-black tracking-tight text-slate-900">ASTBA</span>
                         </div>
                         <div className="mb-8">
-                            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Créer un compte</h2>
-                            <p className="text-base md:text-lg text-slate-500">Rejoignez la plateforme ASTBA pour suivre votre formation.</p>
+                            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">{t('auth.signup_title')}</h2>
+                            <p className="text-base md:text-lg text-slate-500">{t('auth.signup_welcome')}</p>
                         </div>
 
                         {error && (
@@ -121,14 +123,14 @@ const Signup = () => {
 
                         <form className="space-y-5" onSubmit={handleSubmit}>
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Nom complet</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">{t('common.name')}</label>
                                 <div className="relative group">
                                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">person</span>
                                     <input
                                         type="text"
                                         name="name"
                                         className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-base font-medium"
-                                        placeholder="Ex: Jean Dupont"
+                                        placeholder={t('auth.name_placeholder')}
                                         value={formData.name}
                                         onChange={handleChange}
                                         required
@@ -136,14 +138,14 @@ const Signup = () => {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Adresse e-mail</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">{t('common.email')}</label>
                                 <div className="relative group">
                                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">mail</span>
                                     <input
                                         type="email"
                                         name="email"
                                         className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-base font-medium"
-                                        placeholder="nom@exemple.com"
+                                        placeholder={t('auth.email_placeholder')}
                                         value={formData.email}
                                         onChange={handleChange}
                                         required
@@ -151,7 +153,7 @@ const Signup = () => {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Rôle</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">{t('common.role')}</label>
                                 <div className="relative group">
                                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">badge</span>
                                     <select
@@ -161,23 +163,23 @@ const Signup = () => {
                                         onChange={handleChange}
                                         required
                                     >
-                                        <option value="">Sélectionnez votre rôle</option>
-                                        <option value="formateur">Formateur</option>
-                                        <option value="Responsable">Responsable de formation (Entreprise)</option>
-                                        <option value="admin">Membre administratif</option>
+                                        <option value="">{t('auth.role_select')}</option>
+                                        <option value="formateur">{t('auth.roles.formateur')}</option>
+                                        <option value="Responsable">{t('auth.roles.responsable')}</option>
+                                        <option value="admin">{t('auth.roles.admin')}</option>
                                     </select>
                                     <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Mot de passe</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">{t('common.password')}</label>
                                 <div className="relative group">
                                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">lock</span>
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         name="password"
                                         className="w-full pl-12 pr-12 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-base font-medium"
-                                        placeholder="••••••••"
+                                        placeholder={t('auth.password_placeholder')}
                                         value={formData.password}
                                         onChange={handleChange}
                                         required
@@ -192,14 +194,14 @@ const Signup = () => {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Confirmer le mot de passe</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">{t('auth.confirm_password')}</label>
                                 <div className="relative group">
                                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">lock_reset</span>
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         name="confirmPassword"
                                         className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-base font-medium"
-                                        placeholder="••••••••"
+                                        placeholder={t('auth.password_placeholder')}
                                         value={formData.confirmPassword}
                                         onChange={handleChange}
                                         required
@@ -216,7 +218,7 @@ const Signup = () => {
                                     <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                                 ) : (
                                     <>
-                                        <span>S'inscrire</span>
+                                        <span>{t('auth.register')}</span>
                                         <span className="material-symbols-outlined text-xl">person_add</span>
                                     </>
                                 )}
@@ -225,8 +227,8 @@ const Signup = () => {
 
                         <div className="mt-8 text-center">
                             <p className="text-sm text-slate-500">
-                                Déjà un compte ?
-                                <Link to="/login" className="text-primary font-extrabold hover:underline underline-offset-4 ml-1">Se connecter</Link>
+                                {t('auth.has_account')}
+                                <Link to="/login" className="text-primary font-extrabold hover:underline underline-offset-4 ml-1">{t('auth.login_btn')}</Link>
                             </p>
                         </div>
 

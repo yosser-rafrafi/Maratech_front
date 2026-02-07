@@ -196,10 +196,37 @@
 }
 
 /* Footer & Logout */
-.sidebar-footer {
-    margin-top: auto;
-    padding: 16px;
-    border-top: 1px solid #f1f5f9;
+/* Language Switcher */
+.language-switcher {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 8px;
+    padding: 0 16px;
+    justify-content: center;
+}
+
+.lang-btn {
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.lang-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.lang-btn.active {
+    background: #6366f1;
+    color: white;
+    border-color: #6366f1;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
 }
 
 .logout-btn {

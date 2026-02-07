@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import api from '../config/api';
 import Sidebar from '../components/Sidebar';
 import { StatCard, FormationDistributionChart, ProgressLineChart } from '../components/DashboardCharts';
@@ -12,6 +13,7 @@ import StudentDetails from '../components/admin/StudentDetails';
 
 const ResponsableDashboard = () => {
     const { user } = useAuth();
+    const { t } = useTranslation();
     const [stats, setStats] = useState({ formations: 0, students: 0 });
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'formations', 'students', 'certifications'
@@ -46,15 +48,15 @@ const ResponsableDashboard = () => {
             <main className="main-content">
                 <header className="page-header">
                     <div>
-                        <h1>Espace Responsable</h1>
-                        <p>Gestion pédagogique et suivi des formations.</p>
+                        <h1>{t('dashboards.resp_title')}</h1>
+                        <p>{t('dashboards.resp_subtitle', { defaultValue: 'Gestion pédagogique et suivi des formations.' })}</p>
                     </div>
 
                     <div className="header-tabs">
-                        <button className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Vue d'ensemble</button>
-                        <button className={`tab-btn ${activeTab === 'formations' ? 'active' : ''}`} onClick={() => setActiveTab('formations')}>Formations</button>
-                        <button className={`tab-btn ${activeTab === 'students' ? 'active' : ''}`} onClick={() => setActiveTab('students')}>Élèves</button>
-                        <button className={`tab-btn ${activeTab === 'certifications' ? 'active' : ''}`} onClick={() => setActiveTab('certifications')}>Certifications</button>
+                        <button className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>{t('dashboards.overview')}</button>
+                        <button className={`tab-btn ${activeTab === 'formations' ? 'active' : ''}`} onClick={() => setActiveTab('formations')}>{t('dashboards.formations')}</button>
+                        <button className={`tab-btn ${activeTab === 'students' ? 'active' : ''}`} onClick={() => setActiveTab('students')}>{t('dashboards.eleves')}</button>
+                        <button className={`tab-btn ${activeTab === 'certifications' ? 'active' : ''}`} onClick={() => setActiveTab('certifications')}>{t('dashboards.certifications')}</button>
                     </div>
                 </header>
 
@@ -64,25 +66,25 @@ const ResponsableDashboard = () => {
                             {/* Key Metrics Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                 <StatCard
-                                    title="Formations Actives"
+                                    title={t('dashboards.stats.active_formations')}
                                     value={stats.formations}
                                     icon="school"
                                     color="#3b82f6"
                                 />
                                 <StatCard
-                                    title="Élèves Suivis"
+                                    title={t('dashboards.stats.students_followed', { defaultValue: 'Élèves Suivis' })}
                                     value={stats.students}
                                     icon="group"
                                     color="#10b981"
                                 />
                                 <StatCard
-                                    title="Taux de Réussite"
+                                    title={t('dashboards.stats.success_rate')}
                                     value="92%"
                                     icon="emoji_events"
                                     color="#f59e0b"
                                 />
                                 <StatCard
-                                    title="Heures Totales"
+                                    title={t('dashboards.stats.total_hours', { defaultValue: 'Heures Totales' })}
                                     value="1,240"
                                     icon="schedule"
                                     color="#8b5cf6"
@@ -113,7 +115,7 @@ const ResponsableDashboard = () => {
                         <UserManagement
                             allowedRoles={['student', 'formateur']}
                             canApprove={false}
-                            title="Gestion des Utilisateurs"
+                            title={t('dashboards.users_management', { defaultValue: 'Gestion des Utilisateurs' })}
                             showRoleFilter={true}
                             onViewDetails={setViewingStudent}
                         />
@@ -122,7 +124,7 @@ const ResponsableDashboard = () => {
                     {activeTab === 'students' && viewingStudent && (
                         <div className="animation-fade-in">
                             <button onClick={() => setViewingStudent(null)} className="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-2">
-                                <span>←</span> Retour à la liste
+                                <span>←</span> {t('common.back_to_list', { defaultValue: 'Retour à la liste' })}
                             </button>
                             <StudentDetails student={viewingStudent} />
                         </div>

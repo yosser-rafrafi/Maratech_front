@@ -30,10 +30,10 @@ const Home = () => {
   } else if (user.role === 'formateur') {
     return <Navigate to="/formateur" replace />;
   } else if (user.role === 'Responsable') {
+    return <Navigate to="/responsable" replace />;
+  } else if (user.role === 'student' || user.role === 'élève') {
     return <Navigate to="/participant" replace />;
   } else {
-    // If none of the above, check if pending or student
-    if (user.role === 'student') return <Navigate to="/participant" replace />;
     return <Navigate to="/login" replace />;
   }
 };
@@ -67,10 +67,19 @@ function App() {
           />
 
           <Route
+            path="/responsable"
+            element={
+              <PrivateRoute allowedRoles={['Responsable', 'admin']}>
+                <ResponsableDashboard />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
             path="/participant"
             element={
-              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin']}>
-                <ResponsableDashboard />
+              <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
+                <ParticipantDashboard />
               </PrivateRoute>
             }
           />
@@ -78,7 +87,7 @@ function App() {
           <Route
             path="/calendar"
             element={
-              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin']}>
+              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin', 'student', 'élève']}>
                 <Calendar />
               </PrivateRoute>
             }
@@ -87,7 +96,7 @@ function App() {
           <Route
             path="/profile"
             element={
-              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin']}>
+              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin', 'student', 'élève']}>
                 <Profile />
               </PrivateRoute>
             }

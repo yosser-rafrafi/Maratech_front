@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { useTranslation } from 'react-i18next';
 import api from '../config/api';
 import './Dashboard.css';
 
 const AttendancePage = () => {
     const { sessionId } = useParams();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [session, setSession] = useState(null);
     const [attendance, setAttendance] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ const AttendancePage = () => {
             setAttendance(attendanceRes.data.attendance);
         } catch (error) {
             console.error('Error fetching session data:', error);
-            alert('Erreur lors du chargement des données');
+            alert(t('attendance.error_loading', { defaultValue: 'Erreur lors du chargement des données' }));
         } finally {
             setLoading(false);
         }
@@ -53,12 +55,12 @@ const AttendancePage = () => {
             );
 
             await Promise.all(updates);
-            alert('Présences enregistrées avec succès');
+            alert(t('attendance.save_success'));
             setLocalChanges({});
             navigate('/formateur');
         } catch (error) {
             console.error('Error saving attendance:', error);
-            alert('Erreur lors de l\'enregistrement');
+            alert(t('attendance.save_error'));
         } finally {
             setSaving(false);
         }
@@ -72,8 +74,8 @@ const AttendancePage = () => {
         return record?.status || null;
     };
 
-    if (loading) return <div className="dashboard-layout"><Sidebar /><main className="main-content">Chargement...</main></div>;
-    if (!session) return <div className="dashboard-layout"><Sidebar /><main className="main-content">Séance introuvable</main></div>;
+    if (loading) return <div className="dashboard-layout"><Sidebar /><main className="main-content">{t('common.loading')}</main></div>;
+    if (!session) return <div className="dashboard-layout"><Sidebar /><main className="main-content">{t('attendance.not_found')}</main></div>;
 
     const hasChanges = Object.keys(localChanges).length > 0;
     const presentCount = session.participants?.filter(p => {
@@ -103,12 +105,12 @@ const AttendancePage = () => {
                             className="btn-secondary"
                             style={{ marginBottom: '16px' }}
                         >
-                            ← Retour
+                            ← {t('common.back')}
                         </button>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                             <div style={{ fontSize: '24px' }}>📋</div>
                             <h1 style={{ margin: 0, fontSize: '32px', fontWeight: '700', color: '#1e293b' }}>
-                                Gestion des Présences
+                                {t('attendance.title')}
                             </h1>
                         </div>
                         <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>
@@ -214,7 +216,7 @@ const AttendancePage = () => {
                             </span>
                             <input
                                 type="text"
-                                placeholder="Rechercher un élève..."
+                                placeholder={t('attendance.search_student')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 style={{
@@ -249,14 +251,14 @@ const AttendancePage = () => {
                                 boxShadow: hasChanges ? '0 4px 12px rgba(99, 102, 241, 0.3)' : 'none'
                             }}
                         >
-                            <span>💾</span> {saving ? 'Enregistrement...' : 'ENREGISTRER TOUT'}
+                            <span>💾</span> {saving ? t('common.saving', { defaultValue: 'Enregistrement...' }) : t('common.save_all')}
                         </button>
                     </div>
 
                     {/* Participants List */}
                     <div style={{ background: 'white', borderRadius: '16px', padding: '24px', border: '2px solid #e2e8f0' }}>
                         <div style={{ marginBottom: '16px', color: '#64748b', fontSize: '13px' }}>
-                            Total validé : {Object.keys(localChanges).length} / {session.participants?.length || 0} élèves
+                            {t('attendance.total_validated')} : {Object.keys(localChanges).length} / {session.participants?.length || 0} {t('sidebar.student').toLowerCase()}s
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {filteredParticipants.map(participant => {
@@ -358,7 +360,7 @@ const AttendancePage = () => {
                                                     boxShadow: currentStatus === 'present' ? '0 4px 12px rgba(34, 197, 94, 0.3)' : 'none'
                                                 }}
                                             >
-                                                <span>{currentStatus === 'present' ? '✓' : '○'}</span> Présent
+                                                <span>{currentStatus === 'present' ? '✓' : '○'}</span> {t('attendance.present')}
                                             </button>
                                             <button
                                                 onClick={() => handleStatusChange(participant._id, 'late')}
@@ -378,7 +380,7 @@ const AttendancePage = () => {
                                                     boxShadow: currentStatus === 'late' ? '0 4px 12px rgba(245, 158, 11, 0.3)' : 'none'
                                                 }}
                                             >
-                                                <span>{currentStatus === 'late' ? '⏰' : '○'}</span> Retard
+                                                <span>{currentStatus === 'late' ? '⏰' : '○'}</span> {t('attendance.late')}
                                             </button>
                                             <button
                                                 onClick={() => handleStatusChange(participant._id, 'absent')}
@@ -398,7 +400,7 @@ const AttendancePage = () => {
                                                     boxShadow: currentStatus === 'absent' ? '0 4px 12px rgba(239, 68, 68, 0.3)' : 'none'
                                                 }}
                                             >
-                                                <span>{currentStatus === 'absent' ? '✗' : '○'}</span> Absent
+                                                <span>{currentStatus === 'absent' ? '✗' : '○'}</span> {t('attendance.absent')}
                                             </button>
                                         </div>
                                     </div>

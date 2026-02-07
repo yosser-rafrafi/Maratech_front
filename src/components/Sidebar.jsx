@@ -1,10 +1,16 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import './Sidebar.css';
 
 const Sidebar = () => {
     const { user, logout } = useAuth();
     const location = useLocation();
+    const { t, i18n } = useTranslation();
+
+    const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+    };
 
     const isAdmin = user?.role === 'admin';
     const isFormateur = user?.role === 'formateur';
@@ -12,37 +18,31 @@ const Sidebar = () => {
     const isStudent = user?.role === 'student' || user?.role === 'élève';
 
     const getRoleLabel = (role) => {
-        const roles = {
-            admin: 'Administrateur',
-            formateur: 'Formateur',
-            Responsable: 'Responsable',
-            student: 'Élève',
-            'élève': 'Élève'
-        };
-        return roles[role] || role;
+        const roleKey = role === 'student' || role === 'élève' ? 'student' : role.toLowerCase();
+        return t(`sidebar.${roleKey}`, { defaultValue: role });
     };
 
     const navGroups = [
         {
-            label: 'Principal',
+            label: t('sidebar.principal'),
             items: [
                 {
-                    title: 'Tableau de bord',
+                    title: t('sidebar.dashboard'),
                     path: isAdmin ? '/admin' : isFormateur ? '/formateur' : isResponsable ? '/responsable' : '/participant',
                     icon: 'dashboard'
                 },
                 {
-                    title: 'Calendrier Global',
+                    title: t('sidebar.calendar'),
                     path: '/calendar',
                     icon: 'calendar_today'
                 }
             ]
         },
         {
-            label: 'Personnel',
+            label: t('sidebar.personnel'),
             items: [
                 {
-                    title: 'Mon Profil',
+                    title: t('sidebar.profile'),
                     path: '/profile',
                     icon: 'person'
                 }
@@ -101,9 +101,23 @@ const Sidebar = () => {
             </nav>
 
             <div className="sidebar-footer">
+                <div className="language-switcher mb-4 flex gap-2 px-4 justify-center">
+                    <button
+                        onClick={() => changeLanguage('fr')}
+                        className={`lang-btn ${i18n.language.startsWith('fr') ? 'active' : ''}`}
+                    >
+                        FR
+                    </button>
+                    <button
+                        onClick={() => changeLanguage('en')}
+                        className={`lang-btn ${i18n.language.startsWith('en') ? 'active' : ''}`}
+                    >
+                        EN
+                    </button>
+                </div>
                 <button onClick={logout} className="logout-btn">
                     <span className="material-symbols-outlined">logout</span>
-                    <span>Déconnexion</span>
+                    <span>{t('sidebar.logout')}</span>
                 </button>
             </div>
         </aside>
