@@ -1,72 +1,35 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import api from '../config/api';
 import Sidebar from '../components/Sidebar';
+import { StatCard, AttendanceChart, FormationDistributionChart, ProgressLineChart } from '../components/DashboardCharts';
 import './Dashboard.css';
+
+import FormationManagement from '../components/admin/FormationManagement';
+import UserManagement from '../components/admin/UserManagement';
+import CertificationPanel from '../components/admin/CertificationPanel';
+import StudentDetails from '../components/admin/StudentDetails';
 
 const AdminDashboard = () => {
     const { user } = useAuth();
-    const [users, setUsers] = useState([]);
-    const [formations, setFormations] = useState([]);
-    const [userData, setUserData] = useState({ name: '', email: '', password: '', role: 'formateur' });
-    const [editingUser, setEditingUser] = useState(null);
+    const { t } = useTranslation();
+    const [stats, setStats] = useState({ users: { total: 0, pending: 0 }, formations: 0, certificates: 0 });
+    const [viewingStudent, setViewingStudent] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('users'); // 'users' or 'certifications'
+    const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'formations', 'users', 'certifications'
 
     useEffect(() => {
-        fetchUsers();
-        fetchFormations();
+        fetchInitialData();
     }, []);
 
-    const fetchUsers = async () => {
+    const fetchInitialData = async () => {
+        setLoading(true);
         try {
-            const res = await api.get('/admin/users');
-            setUsers(res.data.users);
-            setLoading(false);
-        } catch (err) {
-            console.error(err);
-            setLoading(false);
-        }
-    };
-
-    const fetchFormations = async () => {
-        try {
-            const res = await api.get('/formations');
-            setFormations(res.data.formations);
+            const res = await api.get('/admin/stats');
+            setStats(res.data);
         } catch (err) { console.error(err); }
-    };
-
-    const handleUserSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            if (editingUser) {
-                await api.put(`/admin/users/${editingUser}`, userData);
-            } else {
-                await api.post('/admin/users', userData);
-            }
-            setUserData({ name: '', email: '', password: '', role: 'formateur' });
-            setEditingUser(null);
-            fetchUsers();
-        } catch (error) {
-            alert(error.response?.data?.error || 'Error saving user');
-        }
-    };
-
-    const generateCertificate = async (userId, formationId) => {
-        try {
-            // Check eligibility first
-            const eligibleRes = await api.get(`/admin/certification/eligible/${userId}/${formationId}`);
-            if (!eligibleRes.data.eligible) {
-                return alert(`Inéligible: ${eligibleRes.data.reason}`);
-            }
-
-            if (window.confirm('Générer le certificat pour cet utilisateur ?')) {
-                await api.post('/admin/certification/generate', { userId, formationId });
-                alert('Certificat généré avec succès !');
-            }
-        } catch (error) {
-            alert(error.response?.data?.error || 'Erreur lors de la génération');
-        }
+        setLoading(false);
     };
 
     return (
@@ -76,126 +39,92 @@ const AdminDashboard = () => {
             <main className="main-content">
                 <header className="page-header">
                     <div>
-                        <h1>Espace Administratif</h1>
-                        <p>Gestion des utilisateurs et certifications.</p>
+                        <h1>{t('dashboards.admin_title')}</h1>
+                        <p>{t('dashboards.admin_subtitle', { defaultValue: 'Vue d\'ensemble et analytiques de la plateforme.' })}</p>
                     </div>
+
                     <div className="header-tabs">
-                        <button
-                            className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('users')}
-                        >Utilisateurs</button>
-                        <button
-                            className={`tab-btn ${activeTab === 'certifications' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('certifications')}
-                        >Certifications</button>
+                        <button className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>{t('dashboards.overview')}</button>
+                        <button className={`tab-btn ${activeTab === 'formations' ? 'active' : ''}`} onClick={() => setActiveTab('formations')}>{t('dashboards.formations')}</button>
+                        <button className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>{t('dashboards.users')}</button>
+                        <button className={`tab-btn ${activeTab === 'certifications' ? 'active' : ''}`} onClick={() => setActiveTab('certifications')}>{t('dashboards.certifications')}</button>
                     </div>
                 </header>
 
                 <div className="dashboard-grid">
-                    {activeTab === 'users' ? (
+                    {activeTab === 'overview' && (
                         <>
-                            <section className="dashboard-section">
-                                <div className="section-header">
-                                    <h2>{editingUser ? 'Modifier Utilisateur' : 'Nouvel Utilisateur'}</h2>
-                                </div>
-                                <form onSubmit={handleUserSubmit} className="form-card">
-                                    <input
-                                        type="text"
-                                        placeholder="Nom complet"
-                                        value={userData.name}
-                                        onChange={(e) => setUserData({ ...userData, name: e.target.value })}
-                                        required
-                                    />
-                                    <input
-                                        type="email"
-                                        placeholder="Email"
-                                        value={userData.email}
-                                        onChange={(e) => setUserData({ ...userData, email: e.target.value })}
-                                        required
-                                    />
-                                    {!editingUser && (
-                                        <input
-                                            type="password"
-                                            placeholder="Mot de passe"
-                                            value={userData.password}
-                                            onChange={(e) => setUserData({ ...userData, password: e.target.value })}
-                                            required
-                                        />
-                                    )}
-                                    <select
-                                        value={userData.role}
-                                        onChange={(e) => setUserData({ ...userData, role: e.target.value })}
-                                    >
-                                        <option value="formateur">Formateur</option>
-                                        <option value="Responsable">Responsable Formation</option>
-                                        <option value="admin">Administratif</option>
-                                    </select>
-                                    <button type="submit" className="btn-primary">
-                                        {editingUser ? 'Mettre à jour' : 'Créer Profil'}
-                                    </button>
-                                    {editingUser && (
-                                        <button type="button" className="btn-secondary" onClick={() => {
-                                            setEditingUser(null);
-                                            setUserData({ name: '', email: '', password: '', role: 'formateur' });
-                                        }}>Annuler</button>
-                                    )}
-                                </form>
-                            </section>
+                            {/* Key Metrics Row */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <StatCard
+                                    title={t('dashboards.stats.total_users')}
+                                    value={stats.users?.total || 0}
+                                    icon="group"
+                                    color="#3b82f6"
+                                    trend={12}
+                                />
+                                <StatCard
+                                    title={t('dashboards.stats.pending_users')}
+                                    value={stats.users?.pending || 0}
+                                    icon="person_alert"
+                                    color="#f59e0b"
+                                    trend={-5}
+                                />
+                                <StatCard
+                                    title={t('dashboards.stats.active_formations')}
+                                    value={stats.formations || 0}
+                                    icon="school"
+                                    color="#8b5cf6"
+                                    trend={8}
+                                />
+                                <StatCard
+                                    title={t('dashboards.stats.certificates')}
+                                    value={stats.certificates || 0}
+                                    icon="workspace_premium"
+                                    color="#10b981"
+                                    trend={24}
+                                />
+                            </div>
 
-                            <section className="dashboard-section">
-                                <h2>Liste des Utilisateurs</h2>
-                                <div className="table-container">
-                                    <table className="data-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Nom</th>
-                                                <th>Email</th>
-                                                <th>Rôle</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {users.map(u => (
-                                                <tr key={u._id}>
-                                                    <td>{u.name}</td>
-                                                    <td>{u.email}</td>
-                                                    <td><span className={`role-badge ${u.role}`}>{u.role}</span></td>
-                                                    <td>
-                                                        <button className="btn-icon" onClick={() => {
-                                                            setEditingUser(u._id);
-                                                            setUserData({ name: u.name, email: u.email, role: u.role });
-                                                        }}>✏️</button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                            {/* Charts Row */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Répartition par Formation</h3>
+                                    <div className="h-64">
+                                        <FormationDistributionChart />
+                                    </div>
                                 </div>
-                            </section>
-                        </>
-                    ) : (
-                        <section className="dashboard-section full-width">
-                            <h2>Éligibilité à la Certification</h2>
-                            <p>Associez un utilisateur à une formation pour vérifier son éligibilité.</p>
-                            <div className="certification-checker form-card">
-                                <div className="checker-fields">
-                                    <select id="cert-user">
-                                        <option value="">Sélectionner Utilisateur</option>
-                                        {users.map(u => <option key={u._id} value={u._id}>{u.name} ({u.role})</option>)}
-                                    </select>
-                                    <select id="cert-formation">
-                                        <option value="">Sélectionner Formation</option>
-                                        {formations.map(f => <option key={f._id} value={f._id}>{f.title}</option>)}
-                                    </select>
-                                    <button className="btn-primary" onClick={() => {
-                                        const userId = document.getElementById('cert-user').value;
-                                        const formationId = document.getElementById('cert-formation').value;
-                                        if (userId && formationId) generateCertificate(userId, formationId);
-                                    }}>Vérifier & Générer</button>
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Activité de la Plateforme</h3>
+                                    <div className="h-64">
+                                        <ProgressLineChart />
+                                    </div>
                                 </div>
                             </div>
-                        </section>
+                        </>
                     )}
+
+                    {activeTab === 'formations' && <FormationManagement />}
+
+                    {activeTab === 'users' && !viewingStudent && (
+                        <UserManagement
+                            allowedRoles={['student', 'Responsable', 'formateur']}
+                            canApprove={true}
+                            title={t('dashboards.users_management', { defaultValue: 'Gestion des Utilisateurs' })}
+                            onViewDetails={setViewingStudent}
+                        />
+                    )}
+
+                    {activeTab === 'users' && viewingStudent && (
+                        <div className="animation-fade-in">
+                            <button onClick={() => setViewingStudent(null)} className="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-2">
+                                <span>←</span> Retour à la liste
+                            </button>
+                            <StudentDetails student={viewingStudent} />
+                        </div>
+                    )}
+
+                    {activeTab === 'certifications' && <CertificationPanel />}
                 </div>
             </main>
         </div>

@@ -8,8 +8,12 @@ import FormateurDashboard from './pages/FormateurDashboard';
 import ParticipantDashboard from './pages/ParticipantDashboard';
 import Successful from './pages/Successful';
 import Unsuccessful from './pages/Unsuccessful';
+import PendingApproval from './pages/PendingApproval';
 import ResponsableDashboard from './pages/ResponsableDashboard';
 import Calendar from './pages/Calendar';
+import Profile from './pages/Profile';
+import AttendancePage from './pages/AttendancePage';
+
 import './App.css';
 
 // Home redirect component
@@ -27,6 +31,8 @@ const Home = () => {
     return <Navigate to="/formateur" replace />;
   } else if (user.role === 'Responsable') {
     return <Navigate to="/responsable" replace />;
+  } else if (user.role === 'student' || user.role === 'élève') {
+    return <Navigate to="/participant" replace />;
   } else {
     return <Navigate to="/login" replace />;
   }
@@ -40,6 +46,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/pending-approval" element={<PendingApproval />} />
 
           <Route
             path="/admin"
@@ -62,8 +69,17 @@ function App() {
           <Route
             path="/responsable"
             element={
-              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin']}>
+              <PrivateRoute allowedRoles={['Responsable', 'admin']}>
                 <ResponsableDashboard />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/participant"
+            element={
+              <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
+                <ParticipantDashboard />
               </PrivateRoute>
             }
           />
@@ -71,8 +87,26 @@ function App() {
           <Route
             path="/calendar"
             element={
-              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin']}>
+              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin', 'student', 'élève']}>
                 <Calendar />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin', 'student', 'élève']}>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/attendance/:sessionId"
+            element={
+              <PrivateRoute allowedRoles={['formateur', 'admin']}>
+                <AttendancePage />
               </PrivateRoute>
             }
           />

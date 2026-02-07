@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ASTBA Platform | Créer un compte</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "tech-navy": "#020617",
+                        "accent-blue": "#0ea5e9",
+                        "glow-blue": "#3b82f6",
+                        "background-light": "#f8fafc",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1.25rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+            }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tech-bg {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(59, 130, 246, 0.15) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+        .grid-intersection {
+            background-image: radial-gradient(circle at 50% 50%, #3b82f6 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+        }
+        .circuit-trace {
+            stroke: #1e40af;
+            stroke-width: 1;
+            fill: none;
+            opacity: 0.3;
+        }
+        .hologram-icon {
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6));
+        }
+        .bemo-head-container {
+            perspective: 1000px;
+        }
+        .bemo-bot-head {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+        .robot-head-textured {
+            background: linear-gradient(145deg, #ffffff 0%, #cbd5e1 100%);
+            box-shadow: 
+                inset -5px -5px 15px rgba(0,0,0,0.1),
+                inset 5px 5px 15px rgba(59, 130, 246, 0.2),
+                0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        .robot-face-glow {
+            background: #0f172a;
+            box-shadow: inset 0 0 25px rgba(59, 130, 246, 0.4);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+        .robot-eye-glow {
+            background: #60a5fa;
+            box-shadow: 0 0 20px #3b82f6, 0 0 40px rgba(59, 130, 246, 0.5), inset 0 0 5px #fff;
+        }
+        .btn-glow {
+            box-shadow: 0 0 20px rgba(19, 127, 236, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-glow:hover {
+            box-shadow: 0 0 30px rgba(14, 165, 233, 0.6);
+        }
+        .data-stream {
+            width: 1px;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, #3b82f6, transparent);
+            position: absolute;
+            opacity: 0.2;
+        }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 1023px) {
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: 
+                    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(14, 165, 233, 0.05) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: 0;
+            }
+            
+            .material-symbols-outlined {
+                font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background-light min-h-screen font-display overflow-hidden">
+<div class="flex min-h-screen w-full overflow-hidden">
+<div class="hidden md:flex md:w-3/5 relative overflow-hidden tech-bg">
+<div class="absolute inset-0 grid-intersection"></div>
+<svg class="absolute inset-0 w-full h-full opacity-40" xmlns="http://www.w3.org/2000/svg">
+<path class="circuit-trace" d="M0 100 H200 L250 150 V300 L300 350 H600"></path>
+<path class="circuit-trace" d="M1000 800 H800 L750 750 V600 L700 550 H400"></path>
+<path class="circuit-trace" d="M200 800 V600 L300 500 H500"></path>
+<circle cx="200" cy="100" fill="#3b82f6" r="3"></circle>
+<circle cx="600" cy="350" fill="#3b82f6" r="3"></circle>
+<circle cx="400" cy="550" fill="#3b82f6" r="3"></circle>
+</svg>
+<div class="data-stream hidden lg:block" style="top: 10%; left: 20%;"></div>
+<div class="data-stream hidden lg:block" style="top: 40%; left: 80%;"></div>
+<div class="data-stream hidden lg:block" style="top: 70%; left: 15%;"></div>
+<div class="data-stream hidden lg:block" style="top: 25%; left: 55%;"></div>
+<div class="absolute top-[15%] left-[15%] hologram-icon text-glow-blue opacity-60">
+<span class="material-symbols-outlined !text-4xl lg:!text-6xl">biotech</span>
+</div>
+<div class="absolute bottom-[20%] right-[15%] hologram-icon text-glow-blue opacity-60">
+<span class="material-symbols-outlined !text-5xl lg:!text-7xl">settings_suggest</span>
+</div>
+<div class="absolute top-[40%] right-[10%] hologram-icon text-glow-blue opacity-60">
+<span class="material-symbols-outlined !text-3xl lg:!text-5xl">matter</span>
+</div>
+<div class="relative z-10 flex flex-col items-center justify-center w-full p-8 lg:p-20 text-white">
+<div class="bemo-head-container relative mb-8 lg:mb-16 flex flex-col items-center">
+<div class="bemo-bot-head relative w-48 h-40 lg:w-64 lg:h-56" id="mascot">
+<div class="robot-head-textured w-48 h-40 lg:w-64 lg:h-56 rounded-[2.5rem] lg:rounded-[3.5rem] relative z-20 flex items-center justify-center transition-transform duration-75" id="mascot-head">
+<div class="robot-face-glow w-36 h-28 lg:w-48 lg:h-36 rounded-[2rem] lg:rounded-[2.5rem] flex items-center justify-center gap-6 lg:gap-8 relative overflow-hidden">
+<div class="flex gap-8 lg:gap-10">
+<div class="robot-eye-glow w-8 h-10 lg:w-10 lg:h-12 rounded-full transition-transform duration-75" id="eye-left"></div>
+<div class="robot-eye-glow w-8 h-10 lg:w-10 lg:h-12 rounded-full transition-transform duration-75" id="eye-right"></div>
+</div>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-blue-400/10 to-transparent h-1/3 w-full opacity-50"></div>
+</div>
+<div class="absolute -top-4 lg:-top-6 left-1/2 -translate-x-1/2 flex gap-12 lg:gap-16">
+<div class="w-2 lg:w-3 h-6 lg:h-8 bg-slate-300 rounded-full border-b-4 border-blue-400"></div>
+<div class="w-2 lg:w-3 h-6 lg:h-8 bg-slate-300 rounded-full border-b-4 border-blue-400"></div>
+</div>
+</div>
+<div class="absolute -bottom-8 lg:-bottom-10 left-1/2 -translate-x-1/2 w-32 lg:w-40 h-6 lg:h-8 bg-blue-500/10 rounded-full blur-2xl"></div>
+</div>
+</div>
+<div class="text-center relative">
+<div class="flex items-center justify-center gap-2 lg:gap-4 mb-3 lg:mb-4">
+<div class="bg-blue-600/20 p-2 lg:p-3 rounded-xl lg:rounded-2xl backdrop-blur-md border border-blue-400/30">
+<span class="material-symbols-outlined text-2xl lg:text-4xl text-blue-400">rocket_launch</span>
+</div>
+<h1 class="text-3xl lg:text-6xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">ASTBA</h1>
+</div>
+<p class="text-sm lg:text-xl font-medium max-w-xs lg:max-w-md mx-auto leading-relaxed text-blue-100/80">
+                    Advancing Science and Technology Business Administration.
+                </p>
+</div>
+</div>
+</div>
+<div class="w-full lg:w-2/5 flex flex-col bg-white p-4 sm:p-6 md:p-8 lg:p-16 justify-between overflow-y-auto min-h-screen lg:min-h-0">
+<div class="flex flex-col">
+<div class="flex items-center gap-3 md:hidden mb-6 text-primary">
+<span class="material-symbols-outlined text-3xl sm:text-4xl">rocket_launch</span>
+<span class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">ASTBA</span>
+</div>
+<div class="md:hidden mb-6 text-center">
+<p class="text-sm sm:text-base text-slate-600 font-medium">Rejoignez la plateforme ASTBA pour suivre votre formation.</p>
+</div>
+<div class="mb-6 lg:mb-8">
+<h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Créer un compte</h2>
+<p class="text-sm sm:text-base lg:text-lg text-slate-500">Rejoignez la plateforme ASTBA pour suivre votre formation.</p>
+</div>
+<form class="space-y-4 sm:space-y-5">
+<div>
+<label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">Nom complet</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">person</span>
+<input class="w-full pl-12 sm:pl-14 pr-4 sm:pr-5 py-3 sm:py-4 bg-slate-50 border-2 border-slate-100 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-sm sm:text-base font-medium" placeholder="Ex: Jean Dupont" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">Adresse e-mail</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">mail</span>
+<input class="w-full pl-12 sm:pl-14 pr-4 sm:pr-5 py-3 sm:py-4 bg-slate-50 border-2 border-slate-100 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-sm sm:text-base font-medium" placeholder="nom@exemple.com" type="email"/>
+</div>
+</div>
+<div>
+<label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">Rôle</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">badge</span>
+<select class="w-full pl-12 sm:pl-14 pr-4 sm:pr-5 py-3 sm:py-4 bg-slate-50 border-2 border-slate-100 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 appearance-none transition-all text-sm sm:text-base font-medium cursor-pointer">
+<option value="">Sélectionnez votre rôle</option>
+<option value="student">Étudiant</option>
+<option value="instructor">Formateur</option>
+<option value="admin">Administrateur</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">Mot de passe</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">lock</span>
+<input class="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-3 sm:py-4 bg-slate-50 border-2 border-slate-100 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-sm sm:text-base font-medium" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
+</button>
+</div>
+</div>
+<div>
+<label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">Confirmer le mot de passe</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">lock_reset</span>
+<input class="w-full pl-12 sm:pl-14 pr-4 sm:pr-5 py-3 sm:py-4 bg-slate-50 border-2 border-slate-100 rounded-xl sm:rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-sm sm:text-base font-medium" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<button class="w-full btn-glow bg-primary hover:bg-accent-blue text-white font-extrabold py-3 sm:py-4 lg:py-5 rounded-xl sm:rounded-2xl transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-lg lg:text-xl mt-4" type="submit">
+<span>S'inscrire</span>
+<span class="material-symbols-outlined text-xl sm:text-2xl">person_add</span>
+</button>
+</form>
+<div class="mt-6 sm:mt-8 text-center">
+<p class="text-sm sm:text-base text-slate-500">
+                    Déjà un compte ? 
+                    <a class="text-primary font-extrabold hover:underline underline-offset-4 ml-1" href="#">Se connecter</a>
+</p>
+</div>
+</div>
+<div class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-slate-100">
+<div class="flex flex-wrap gap-4 sm:gap-6 text-xs sm:text-sm text-slate-400 font-bold mb-4 sm:mb-6">
+<a class="hover:text-primary transition-colors uppercase tracking-widest" href="#">Support</a>
+<a class="hover:text-primary transition-colors uppercase tracking-widest" href="#">Policies</a>
+<a class="hover:text-primary transition-colors uppercase tracking-widest" href="#">Compliance</a>
+</div>
+<p class="text-[10px] sm:text-[11px] text-slate-400 uppercase tracking-[0.1em] sm:tracking-[0.2em] leading-relaxed font-bold">
+                © 2024 ASTBA. Science &amp; Technology Business Association. 
+                <span class="block mt-1 text-slate-300">Global Certification Standard v2.4.0</span>
+</p>
+</div>
+</div>
+</div>
+<script>
+    const mascotHead = document.getElementById('mascot-head');
+    const eyeLeft = document.getElementById('eye-left');
+    const eyeRight = document.getElementById('eye-right');
+    document.addEventListener('mousemove', (e) => {
+        const x = e.clientX;
+        const y = e.clientY;
+        // Calculate relative to the mascot's position on screen
+        const rect = mascotHead.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const deltaX = (x - centerX) / 30;
+        const deltaY = (y - centerY) / 30;
+        // Head rotation limits
+        const rotX = Math.min(Math.max(-deltaY, -15), 15);
+        const rotY = Math.min(Math.max(deltaX, -25), 25);
+        mascotHead.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(40px)`;
+        // Eye tracking
+        const eyeX = Math.min(Math.max(deltaX / 1.5, -10), 10);
+        const eyeY = Math.min(Math.max(deltaY / 1.5, -10), 10);
+        eyeLeft.style.transform = `translate(${eyeX}px, ${eyeY}px)`;
+        eyeRight.style.transform = `translate(${eyeX}px, ${eyeY}px)`;
+    });
+    document.addEventListener('mouseleave', () => {
+        mascotHead.style.transform = `rotateX(0deg) rotateY(0deg) translateZ(0px)`;
+        eyeLeft.style.transform = `translate(0px, 0px)`;
+        eyeRight.style.transform = `translate(0px, 0px)`;
+    });
+</script>
+
+</body></html>

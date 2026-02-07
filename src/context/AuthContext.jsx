@@ -47,13 +47,21 @@ export const AuthProvider = ({ children }) => {
     const signup = async (signupData) => {
         try {
             const response = await api.post('/auth/signup', signupData);
-            const { token, user } = response.data;
 
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
-            setUser(user);
+            // If token is returned, login the user (legacy/admin?)
+            if (response.data.token) {
+                const { token, user } = response.data;
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
+                setUser(user);
+                return user;
+            }
 
-            return user;
+            // If no token (pending approval), return success message
+            return {
+                success: true,
+                message: response.data.message
+            };
         } catch (error) {
             return {
                 success: false,
