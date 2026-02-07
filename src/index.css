@@ -12,6 +12,8 @@
     padding: 0;
     overflow: hidden;
   }
+}
+
 :root {
   --primary-color: #6366f1;
   --primary-hover: #4f46e5;
