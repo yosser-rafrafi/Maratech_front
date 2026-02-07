@@ -24,10 +24,15 @@ const Login = () => {
 
         try {
             const user = await login(formData.email, formData.password);
+
             // Redirect based on role
-            if (user.role === 'admin') navigate('/admin');
-            else if (user.role === 'formateur') navigate('/formateur');
-            else navigate('/participant');
+            if (user.role === 'admin') {
+                navigate('/admin');
+            } else if (user.role === 'formateur') {
+                navigate('/formateur');
+            } else {
+                navigate('/participant');
+            }
         } catch (err) {
             setError(err.response?.data?.error || 'Failed to login');
         } finally {
