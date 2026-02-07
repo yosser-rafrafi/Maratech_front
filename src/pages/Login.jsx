@@ -8,6 +8,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     // Animation refs
     const mascotHeadRef = useRef(null);
@@ -56,18 +57,30 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+
         try {
+            console.log('Attempting login with:', email);
             const result = await login(email, password);
+            console.log('Login result:', result);
 
             // Check success property or if result is a user object (which usually means success in this context)
             if (result && result.success === false) {
+                console.log('Login failed, navigating to /unsuccessful');
                 navigate('/unsuccessful');
-            } else {
+            } else if (result && result.id) {
+                // If result has an id, it's a user object (success)
+                console.log('Login successful, navigating to /success');
                 navigate('/success');
+            } else {
+                console.log('Unexpected result, navigating to /unsuccessful');
+                navigate('/unsuccessful');
             }
         } catch (err) {
-            console.error(err);
+            console.error('Login error:', err);
             navigate('/unsuccessful');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -181,8 +194,8 @@ const Login = () => {
                                         <div className="w-3 h-8 bg-slate-300 rounded-full border-b-4 border-blue-400"></div>
                                     </div>
                                 </div>
-                                <div className="robot-body-textured w-44 h-20 rounded-b-[2.5rem] -mt-6 z-10 border-t-0 shadow-2xl"></div>
-                                <div className="mt-8 w-40 h-6 bg-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+                                {/* Glow under head */}
+                                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-40 h-8 bg-blue-500/20 rounded-full blur-2xl"></div>
                             </div>
                         </div>
 
