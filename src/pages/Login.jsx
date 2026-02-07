@@ -1,24 +1,30 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import RobotMascot from '../components/RobotMascot';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const { login } = useAuth();
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const { login } = useAuth();
-    const navigate = useNavigate();
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
-        const result = await login(email, password);
+        try {
+            const user = await login(formData.email, formData.password);
 
         if (result.success) {
             navigate('/success');
@@ -26,8 +32,6 @@ const Login = () => {
             setError(result.error);
             navigate('/unsuccessful');
         }
-
-        setLoading(false);
     };
 
     return (

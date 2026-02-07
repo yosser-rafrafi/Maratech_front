@@ -1,0 +1,142 @@
+.calendar-container {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.calendar-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.calendar-days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 10px;
+}
+
+.day-name {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--border-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.calendar-cell {
+    background: white;
+    min-height: 120px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.calendar-cell:hover:not(.empty) {
+    background: #f8fafc;
+}
+
+.calendar-cell.empty {
+    background: #f1f5f9;
+}
+
+.day-number {
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.cell-sessions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    max-height: 80px;
+}
+
+.session-tag {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    border-left: 3px solid #0ea5e9;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.session-tag.formation-start {
+    background: #f0fdf4;
+    color: #166534;
+    border-left-color: #22c55e;
+}
+
+.session-tag:hover {
+    transform: scale(1.02);
+    background: #bae6fd;
+}
+
+.session-time {
+    font-weight: 700;
+    font-size: 10px;
+}
+
+.session-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar-loading {
+    padding: 100px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.btn-icon {
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: white;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+}

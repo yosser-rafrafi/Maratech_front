@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('user', JSON.stringify(user));
             setUser(user);
 
-            return { success: true };
+            return user;
         } catch (error) {
             return {
                 success: false,
@@ -44,16 +44,16 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const signup = async (name, email, password, role) => {
+    const signup = async (signupData) => {
         try {
-            const response = await api.post('/auth/signup', { name, email, password, role });
+            const response = await api.post('/auth/signup', signupData);
             const { token, user } = response.data;
 
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));
             setUser(user);
 
-            return { success: true };
+            return user;
         } catch (error) {
             return {
                 success: false,

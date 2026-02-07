@@ -8,6 +8,8 @@ import FormateurDashboard from './pages/FormateurDashboard';
 import ParticipantDashboard from './pages/ParticipantDashboard';
 import Successful from './pages/Successful';
 import Unsuccessful from './pages/Unsuccessful';
+import ResponsableDashboard from './pages/ResponsableDashboard';
+import Calendar from './pages/Calendar';
 import './App.css';
 
 // Home redirect component
@@ -23,8 +25,10 @@ const Home = () => {
     return <Navigate to="/admin" replace />;
   } else if (user.role === 'formateur') {
     return <Navigate to="/formateur" replace />;
-  } else {
+  } else if (user.role === 'Responsable') {
     return <Navigate to="/participant" replace />;
+  } else {
+    return <Navigate to="/login" replace />;
   }
 };
 
@@ -58,8 +62,17 @@ function App() {
           <Route
             path="/participant"
             element={
-              <PrivateRoute allowedRoles={['participant', 'formateur', 'admin']}>
-                <ParticipantDashboard />
+              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin']}>
+                <ResponsableDashboard />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/calendar"
+            element={
+              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin']}>
+                <Calendar />
               </PrivateRoute>
             }
           />
