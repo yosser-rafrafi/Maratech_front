@@ -40,7 +40,7 @@ const AdminDashboard = () => {
                 <header className="page-header">
                     <div>
                         <h1>{t('dashboards.admin_title')}</h1>
-                        <p>{t('dashboards.admin_subtitle', { defaultValue: 'Vue d\'ensemble et analytiques de la plateforme.' })}</p>
+                        <p>{t('dashboards.admin_subtitle')}</p>
                     </div>
 
                     <div className="header-tabs">
@@ -89,13 +89,13 @@ const AdminDashboard = () => {
                             {/* Charts Row */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Répartition par Formation</h3>
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.formation_distribution')}</h3>
                                     <div className="h-64">
                                         <FormationDistributionChart />
                                     </div>
                                 </div>
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Activité de la Plateforme</h3>
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.platform_activity')}</h3>
                                     <div className="h-64">
                                         <ProgressLineChart />
                                     </div>
@@ -110,7 +110,7 @@ const AdminDashboard = () => {
                         <UserManagement
                             allowedRoles={['student', 'Responsable', 'formateur']}
                             canApprove={true}
-                            title={t('dashboards.users_management', { defaultValue: 'Gestion des Utilisateurs' })}
+                            title={t('dashboards.users_management')}
                             onViewDetails={setViewingStudent}
                         />
                     )}
@@ -118,7 +118,7 @@ const AdminDashboard = () => {
                     {activeTab === 'users' && viewingStudent && (
                         <div className="animation-fade-in">
                             <button onClick={() => setViewingStudent(null)} className="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-2">
-                                <span>←</span> Retour à la liste
+                                <span>←</span> {t('common.back')}
                             </button>
                             <StudentDetails student={viewingStudent} />
                         </div>

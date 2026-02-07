@@ -34,6 +34,27 @@ const StudentDashboard = () => {
         fetchDashboardData();
     }, []);
 
+    const downloadCertificate = async (formationId, title) => {
+        try {
+            const response = await api.get(`/student/certificate/${formationId}`, {
+                responseType: 'blob' // Important for handling binary data
+            });
+
+            // Create a URL for the blob
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Certificate-${title.replace(/[^a-z0-9]/gi, '_')}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading certificate:', error);
+            alert('Could not download certificate. Please try again later.');
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -50,10 +71,10 @@ const StudentDashboard = () => {
                 <header className="page-header mb-8">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900">
-                            {t('welcome_back', 'Welcome back')}, {user?.name?.split(' ')[0]}!
+                            {t('student_dashboard.welcome_back')}, {user?.name?.split(' ')[0]}!
                         </h1>
                         <p className="text-slate-500">
-                            {t('student_dashboard_subtitle', 'Here is your learning progress overview.')}
+                            {t('student_dashboard.subtitle')}
                         </p>
                     </div>
                 </header>
@@ -65,7 +86,7 @@ const StudentDashboard = () => {
                             <span className="material-symbols-outlined text-2xl">school</span>
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500 font-medium">Formations (Courses)</p>
+                            <p className="text-sm text-slate-500 font-medium">{t('dashboards.formations')}</p>
                             <h3 className="text-2xl font-bold text-slate-900">{data.stats.totalFormations}</h3>
                         </div>
                     </div>
@@ -75,7 +96,7 @@ const StudentDashboard = () => {
                             <span className="material-symbols-outlined text-2xl">check_circle</span>
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500 font-medium">Sessions Attended</p>
+                            <p className="text-sm text-slate-500 font-medium">{t('dashboards.stats.attended_sessions')}</p>
                             <h3 className="text-2xl font-bold text-slate-900">{data.stats.totalSessionsAttended}</h3>
                         </div>
                     </div>
@@ -85,7 +106,7 @@ const StudentDashboard = () => {
                             <span className="material-symbols-outlined text-2xl">warning</span>
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500 font-medium">Missed Sessions</p>
+                            <p className="text-sm text-slate-500 font-medium">{t('dashboards.stats.missed_sessions')}</p>
                             <h3 className="text-2xl font-bold text-slate-900">{data.stats.totalMissedSessions}</h3>
                         </div>
                     </div>
@@ -94,11 +115,11 @@ const StudentDashboard = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* My Formations List */}
                     <div className="lg:col-span-2 space-y-6">
-                        <h2 className="text-xl font-bold text-slate-800">My Formations</h2>
+                        <h2 className="text-xl font-bold text-slate-800">{t('student_dashboard.my_formations')}</h2>
 
                         {data.formations.length === 0 ? (
                             <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 text-center text-slate-500">
-                                You are not enrolled in any formations yet.
+                                {t('student_dashboard.no_formations')}
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 gap-4">
@@ -128,14 +149,26 @@ const StudentDashboard = () => {
                                             ></div>
                                         </div>
                                         <div className="flex justify-between text-xs text-slate-500">
-                                            <span>{formation.attendedSessions} attended</span>
-                                            <span>{formation.totalSessions} total sessions</span>
+                                            <span>{formation.attendedSessions} {t('student_dashboard.attended')}</span>
+                                            <span>{formation.totalSessions} {t('student_dashboard.total_sessions')}</span>
                                         </div>
 
                                         {formation.missedSessions > 0 && (
                                             <div className="mt-4 flex items-center gap-2 text-sm text-red-600 bg-red-50 p-2 rounded-lg border border-red-100">
                                                 <span className="material-symbols-outlined text-base">warning</span>
-                                                You have missed {formation.missedSessions} session(s).
+                                                {t('student_dashboard.missed_warning', { count: formation.missedSessions })}
+                                            </div>
+                                        )}
+
+                                        {formation.progress === 100 && (
+                                            <div className="mt-4">
+                                                <button
+                                                    onClick={() => downloadCertificate(formation._id, formation.title)}
+                                                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium hover:shadow-lg hover:shadow-blue-200 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <span className="material-symbols-outlined">workspace_premium</span>
+                                                    {t('student_dashboard.download_certificate')}
+                                                </button>
                                             </div>
                                         )}
                                     </div>
@@ -146,10 +179,10 @@ const StudentDashboard = () => {
 
                     {/* Upcoming Sessions */}
                     <div className="space-y-6">
-                        <h2 className="text-xl font-bold text-slate-800">Upcoming Sessions</h2>
+                        <h2 className="text-xl font-bold text-slate-800">{t('student_dashboard.upcoming_sessions')}</h2>
                         {data.upcomingSessions.length === 0 ? (
                             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-center text-slate-500">
-                                No upcoming sessions.
+                                {t('student_dashboard.no_upcoming')}
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -179,7 +212,7 @@ const StudentDashboard = () => {
                                                     <span className="material-symbols-outlined text-sm">schedule</span>
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs text-slate-400 font-medium">Date & Heure</p>
+                                                    <p className="text-xs text-slate-400 font-medium">{t('student_dashboard.date_time')}</p>
                                                     <p className="text-sm font-semibold">
                                                         {new Date(session.date).toLocaleDateString()} • {session.startTime} - {session.endTime}
                                                     </p>
@@ -191,14 +224,14 @@ const StudentDashboard = () => {
                                                     <span className="material-symbols-outlined text-sm">person</span>
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs text-slate-400 font-medium">Formateur</p>
+                                                    <p className="text-xs text-slate-400 font-medium">{t('student_dashboard.trainer')}</p>
                                                     <p className="text-sm font-semibold">{session.formateur}</p>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <button className="w-full py-2.5 rounded-xl bg-slate-50 text-slate-600 font-medium hover:bg-blue-600 hover:text-white transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-blue-200">
-                                            <span>Voir détails</span>
+                                            <span>{t('student_dashboard.view_details')}</span>
                                             <span className="material-symbols-outlined text-sm">arrow_forward</span>
                                         </button>
                                     </div>

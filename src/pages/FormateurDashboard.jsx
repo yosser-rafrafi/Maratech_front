@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import api from '../config/api';
 import Sidebar from '../components/Sidebar';
 import { StatCard, AttendanceChart } from '../components/DashboardCharts';
@@ -8,6 +9,7 @@ import './Dashboard.css';
 
 const FormateurDashboard = () => {
     const { user } = useAuth();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [sessions, setSessions] = useState([]);
     const [allSessions, setAllSessions] = useState([]); // Store all sessions for formation details
@@ -107,10 +109,10 @@ const FormateurDashboard = () => {
 
     // Stats Calculation
     const dashboardStats = [
-        { label: 'Formations', value: assignedFormations.length, icon: '📚', color: '#6366f1' },
-        { label: 'Sessions Actives', value: sessions.length, icon: '📅', color: '#8b5cf6' },
-        { label: 'Total Heures', value: assignedFormations.reduce((acc, curr) => acc + curr.duration, 0), icon: '⏱', color: '#ec4899' },
-        { label: 'Taux Présence', value: '85%', icon: '📈', color: '#10b981' } // Mock/Summary Rate
+        { label: t('dashboards.formations'), value: assignedFormations.length, icon: '📚', color: '#6366f1' },
+        { label: t('dashboards.stats.active_formations'), value: sessions.length, icon: '📅', color: '#8b5cf6' },
+        { label: t('dashboards.stats.total_hours'), value: assignedFormations.reduce((acc, curr) => acc + curr.duration, 0), icon: '⏱', color: '#ec4899' },
+        { label: t('dashboards.stats.success_rate'), value: '85%', icon: '📈', color: '#10b981' } // Mock/Summary Rate
     ];
 
     if (loading) {
@@ -118,7 +120,7 @@ const FormateurDashboard = () => {
             <div className="dashboard-layout">
                 <Sidebar />
                 <main className="main-content">
-                    <div className="empty-state">Chargement de votre espace...</div>
+                    <div className="empty-state">{t('common.loading')}</div>
                 </main>
             </div>
         );
@@ -131,8 +133,8 @@ const FormateurDashboard = () => {
             <main className="main-content">
                 <header className="page-header">
                     <div>
-                        <h1>Espace Formateur</h1>
-                        <p>Bienvenue, {user.name}. Suivi pédagogique et présences.</p>
+                        <h1>{t('dashboards.form_title')}</h1>
+                        <p>{t('dashboards.form_subtitle', { name: user.name })}</p>
                     </div>
                 </header>
 
@@ -150,15 +152,15 @@ const FormateurDashboard = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
                     <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <h3 className="text-lg font-bold text-slate-800 mb-6">Taux de Présence Hebdomadaire</h3>
+                        <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.weekly_attendance')}</h3>
                         <div className="h-64">
                             <AttendanceChart />
                         </div>
                     </div>
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <h3 className="text-lg font-bold text-slate-800 mb-4">Prochaines Sessions</h3>
+                        <h3 className="text-lg font-bold text-slate-800 mb-4">{t('dashboards.upcoming_sessions')}</h3>
                         {/* Compact list of sessions could go here */}
-                        <div className="text-sm text-slate-500 italic">Voir la liste complète ci-dessous</div>
+                        <div className="text-sm text-slate-500 italic">{t('dashboards.see_full_list')}</div>
                     </div>
                 </div>
 
@@ -167,7 +169,7 @@ const FormateurDashboard = () => {
                     <input
                         type="text"
                         className="search-input"
-                        placeholder="Rechercher une formation ou une session..."
+                        placeholder={t('common.search')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -180,14 +182,14 @@ const FormateurDashboard = () => {
                             <div className="section-header">
                                 <h2 className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-indigo-600">school</span>
-                                    Mes Formations Assignées
+                                    {t('dashboards.assigned_formations')}
                                 </h2>
                             </div>
 
                             {filteredFormations.length === 0 ? (
                                 <div className="empty-state">
                                     <span className="empty-icon">📂</span>
-                                    <p>{searchTerm ? 'Aucun résultat pour votre recherche.' : 'Aucune formation assignée pour le moment.'}</p>
+                                    <p>{searchTerm ? t('common.no_results', 'Aucun résultat') : t('dashboards.no_assigned_formations')}</p>
                                 </div>
                             ) : (
                                 <div className="cards-grid">
@@ -202,7 +204,7 @@ const FormateurDashboard = () => {
                                                 <span className="material-symbols-outlined text-indigo-400">arrow_forward</span>
                                             </div>
                                             <p className="text-slate-600 line-clamp-2 mb-4">
-                                                {formation.description || 'Pas de description disponible.'}
+                                                {formation.description || t('common.no_description', 'Pas de description')}
                                             </p>
                                             <div className="card-meta">
                                                 <span className="flex items-center gap-1">
@@ -211,7 +213,7 @@ const FormateurDashboard = () => {
                                                 </span>
                                                 <span className="flex items-center gap-1 text-indigo-600 font-medium">
                                                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>calendar_month</span>
-                                                    {allSessions.filter(s => s.formation?._id === formation._id).length} séances
+                                                    {t('dashboards.sessions_count', { count: allSessions.filter(s => s.formation?._id === formation._id).length })}
                                                 </span>
                                             </div>
                                         </div>
@@ -224,22 +226,22 @@ const FormateurDashboard = () => {
                             <div className="section-header">
                                 <h2 className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-purple-600">event_available</span>
-                                    Mes Sessions de la Semaine
+                                    {t('dashboards.weekly_sessions')}
                                 </h2>
                             </div>
 
                             {filteredSessions.length === 0 ? (
                                 <div className="empty-state">
                                     <span className="empty-icon">📅</span>
-                                    <p>{searchTerm ? 'Aucune session trouvée pour ce terme.' : 'Aucune session programmée cette semaine.'}</p>
+                                    <p>{searchTerm ? t('common.no_session_found') : t('dashboards.no_weekly_sessions')}</p>
                                 </div>
                             ) : (
                                 <div className="cards-grid">
                                     {filteredSessions.map((session) => (
                                         <div key={session._id} className="card border-l-4 border-l-purple-500">
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                <h3 className="font-bold text-slate-800">{session.formation?.title || 'Formation inconnue'}</h3>
-                                                <span className="status-badge status-present">Planifié</span>
+                                                <h3 className="font-bold text-slate-800">{session.formation?.title || t('common.unknown_formation', 'Formation inconnue')}</h3>
+                                                <span className="status-badge status-present">{t('common.status')}</span>
                                             </div>
                                             <div className="card-meta mt-4">
                                                 <span className="flex items-center gap-1">
@@ -253,14 +255,14 @@ const FormateurDashboard = () => {
                                             </div>
                                             <div className="mt-4 flex items-center justify-between">
                                                 <p className="text-sm font-medium m-0">
-                                                    Participants: <span className="text-indigo-600">{session.participants?.length || 0}/{session.maxParticipants || 30}</span>
+                                                    {t('common.participants')}: <span className="text-indigo-600">{session.participants?.length || 0}/{session.maxParticipants || 30}</span>
                                                 </p>
                                                 <button
                                                     onClick={() => navigate(`/attendance/${session._id}`)}
                                                     className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-colors shadow-sm"
                                                 >
                                                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>fact_check</span>
-                                                    Présences
+                                                    {t('common.actions')}
                                                 </button>
                                             </div>
                                         </div>
@@ -277,7 +279,7 @@ const FormateurDashboard = () => {
                             className="mb-8 inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-bold transition-all hover:gap-3"
                         >
                             <span className="material-symbols-outlined">arrow_back</span>
-                            Retour à la liste des formations
+                            {t('common.back_to_formations', 'Retour à la liste des formations')}
                         </button>
 
                         <div className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden mb-10 transition-all">
@@ -285,7 +287,7 @@ const FormateurDashboard = () => {
                                 <div className="relative z-10">
                                     <h2 className="text-4xl font-black mb-4 tracking-tight">{viewingFormation.title}</h2>
                                     <p className="text-indigo-100 text-xl max-w-2xl leading-relaxed">
-                                        {viewingFormation.description || 'Cette formation ne contient pas de description détaillée.'}
+                                        {viewingFormation.description || t('common.no_detail_description')}
                                     </p>
                                 </div>
                                 <div className="absolute top-0 right-0 p-8 opacity-10">
@@ -300,7 +302,7 @@ const FormateurDashboard = () => {
                                             <span className="material-symbols-outlined text-indigo-600 text-3xl">timer</span>
                                         </div>
                                         <div>
-                                            <div className="text-sm font-bold text-indigo-900/40 uppercase tracking-wider">Durée Totale</div>
+                                            <div className="text-sm font-bold text-indigo-900/40 uppercase tracking-wider">{t('dashboards.stats.total_hours')}</div>
                                             <div className="text-2xl font-black text-indigo-900">{viewingFormation.duration}h</div>
                                         </div>
                                     </div>
@@ -310,7 +312,7 @@ const FormateurDashboard = () => {
                                             <span className="material-symbols-outlined text-purple-600 text-3xl">event_repeat</span>
                                         </div>
                                         <div>
-                                            <div className="text-sm font-bold text-purple-900/40 uppercase tracking-wider">Total Séances</div>
+                                            <div className="text-sm font-bold text-purple-900/40 uppercase tracking-wider">{t('dashboards.stats.total_sessions')}</div>
                                             <div className="text-2xl font-black text-purple-900">
                                                 {allSessions.filter(s => s.formation?._id === viewingFormation._id).length}
                                             </div>
@@ -322,7 +324,7 @@ const FormateurDashboard = () => {
                                             <span className="material-symbols-outlined text-emerald-600 text-3xl">group</span>
                                         </div>
                                         <div>
-                                            <div className="text-sm font-bold text-emerald-900/40 uppercase tracking-wider">Participants</div>
+                                            <div className="text-sm font-bold text-emerald-900/40 uppercase tracking-wider">{t('common.participants')}</div>
                                             <div className="text-2xl font-black text-emerald-900">
                                                 {allSessions
                                                     .filter(s => s.formation?._id === viewingFormation._id)
@@ -335,14 +337,14 @@ const FormateurDashboard = () => {
                                 <div className="flex items-center justify-between mb-8 border-b border-slate-100 pb-4">
                                     <h3 className="text-2xl font-black text-slate-800 flex items-center gap-3">
                                         <span className="material-symbols-outlined text-indigo-600">calendar_month</span>
-                                        Déroulement des séances
+                                        {t('dashboards.session_flow')}
                                     </h3>
                                 </div>
 
                                 {allSessions.filter(s => s.formation?._id === viewingFormation._id).length === 0 ? (
                                     <div className="empty-state p-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
                                         <span className="empty-icon text-6xl mb-4">📅</span>
-                                        <p className="text-lg font-bold text-slate-400">Aucune séance n'est encore programmée pour cette formation.</p>
+                                        <p className="text-lg font-bold text-slate-400">{t('dashboards.no_sessions_programmed')}</p>
                                     </div>
                                 ) : (
                                     <div className="grid gap-4">
@@ -387,7 +389,7 @@ const FormateurDashboard = () => {
                                                         className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl transition-all shadow-md hover:shadow-xl hover:translate-x-1"
                                                     >
                                                         <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>fact_check</span>
-                                                        Appel / Présences
+                                                        {t('common.actions')}
                                                     </button>
                                                 </div>
                                             ))}

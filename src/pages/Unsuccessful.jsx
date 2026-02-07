@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Unsuccessful = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const mascotHeadRef = useRef(null);
     const eyeLeftRef = useRef(null);
     const eyeRightRef = useRef(null);
@@ -184,10 +186,10 @@ const Unsuccessful = () => {
                             <div className="speech-bubble absolute left-[105%] top-1/2 -translate-y-1/2 px-6 py-4 rounded-2xl w-[240px]">
                                 <div className="flex flex-col gap-1">
                                     <p className="text-slate-900 font-extrabold text-xl tracking-tight leading-tight">
-                                        Access Denied.
+                                        {t('unsuccessful.access_denied', { defaultValue: 'Access Denied.' })}
                                     </p>
                                     <p className="text-slate-900 font-extrabold text-xl tracking-tight leading-tight flex items-center gap-2">
-                                        Let's try that again!
+                                        {t('unsuccessful.try_again', { defaultValue: "Let's try that again!" })}
                                         <span className="material-symbols-outlined text-red-500 text-xl">warning</span>
                                     </p>
                                 </div>
@@ -220,19 +222,19 @@ const Unsuccessful = () => {
 
                         <div className="mb-8 flex items-center gap-3 bg-red-50 border border-red-200 p-4 rounded-xl text-red-600 animate-in fade-in slide-in-from-top-4 duration-300">
                             <span className="material-symbols-outlined">error</span>
-                            <span className="font-bold text-sm">Authentication Failed</span>
+                            <span className="font-bold text-sm">{t('unsuccessful.auth_failed', { defaultValue: 'Authentication Failed' })}</span>
                         </div>
 
                         <div className="mb-10">
-                            <h2 className="text-3xl font-extrabold text-slate-900 mb-2">Login Failed</h2>
-                            <p className="text-slate-500">The credentials you provided were incorrect. Please try again.</p>
+                            <h2 className="text-3xl font-extrabold text-slate-900 mb-2">{t('unsuccessful.title', { defaultValue: 'Login Failed' })}</h2>
+                            <p className="text-slate-500">{t('unsuccessful.message', { defaultValue: 'The credentials you provided were incorrect. Please try again.' })}</p>
                         </div>
 
                         <button
                             onClick={() => navigate('/login')}
                             className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-slate-200 transition-all transform hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2"
                         >
-                            Return to Login
+                            {t('unsuccessful.return_to_login', { defaultValue: 'Return to Login' })}
                             <span className="material-symbols-outlined">arrow_back</span>
                         </button>
                     </div>
@@ -240,13 +242,13 @@ const Unsuccessful = () => {
                     {/* Footer */}
                     <div className="mt-12 pt-8 border-t border-slate-100 w-full">
                         <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-400 font-bold mb-6">
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Support</a>
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Policies</a>
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Compliance</a>
+                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.support')}</a>
+                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.policies')}</a>
+                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">{t('common.footer.compliance')}</a>
                         </div>
                         <p className="text-[11px] text-center text-slate-400 uppercase tracking-[0.2em] leading-relaxed font-bold">
-                            © 2024 ASTBA. Science & Technology Business Association.
-                            <span className="block mt-1 text-slate-300">Global Certification Standard v2.4.0</span>
+                            {t('common.footer.copyright')}
+                            <span className="block mt-1 text-slate-300">{t('common.footer.version')}</span>
                         </p>
                     </div>
                 </div>
