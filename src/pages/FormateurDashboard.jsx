@@ -12,6 +12,7 @@ const FormateurDashboard = () => {
     const [attendance, setAttendance] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
+    const [stats, setStats] = useState({});
 
     useEffect(() => {
         const loadData = async () => {
@@ -47,6 +48,7 @@ const FormateurDashboard = () => {
         try {
             const response = await api.get(`/attendance/session/${sessionId}`);
             setAttendance(response.data.attendance);
+            setStats(response.data.stats || {});
         } catch (error) {
             console.error('Error fetching attendance:', error);
         }
@@ -65,10 +67,27 @@ const FormateurDashboard = () => {
         }
     };
 
+    const markAllPresent = async () => {
+        if (!selectedSession || !selectedSession.participants) return;
+        if (!window.confirm('Marquer tous les participants comme PRÉSENTS ?')) return;
+
+        try {
+            const participants = selectedSession.participants.map(p => p._id);
+            await api.post('/attendance/batch', {
+                session: selectedSession._id,
+                participants,
+                status: 'present'
+            });
+            fetchAttendance(selectedSession._id);
+            alert('Tout le monde est marqué présent !');
+        } catch (error) {
+            alert('Erreur lors du marquage groupé');
+        }
+    };
+
     const viewSessionDetails = (session) => {
         setSelectedSession(session);
         fetchAttendance(session._id);
-        // Scroll to details
         setTimeout(() => {
             document.getElementById('attendance-section')?.scrollIntoView({ behavior: 'smooth' });
         }, 100);
@@ -84,7 +103,7 @@ const FormateurDashboard = () => {
     );
 
     // Stats Calculation
-    const stats = [
+    const dashboardStats = [
         { label: 'Formations', value: assignedFormations.length, icon: '📚', color: '#6366f1' },
         { label: 'Sessions Actives', value: sessions.length, icon: '📅', color: '#8b5cf6' },
         { label: 'Total Heures', value: assignedFormations.reduce((acc, curr) => acc + curr.duration, 0), icon: '⏱', color: '#ec4899' },
@@ -115,7 +134,7 @@ const FormateurDashboard = () => {
                 </header>
 
                 <div className="stats-grid">
-                    {stats.map((stat, idx) => (
+                    {dashboardStats.map((stat, idx) => (
                         <div key={idx} className="stat-card">
                             <div className="stat-icon" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
                                 {stat.icon}
@@ -204,7 +223,10 @@ const FormateurDashboard = () => {
                                 <h2 style={{ marginBottom: '4px' }}>Feuille de Présence</h2>
                                 <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Session : {selectedSession.formation?.title}</p>
                             </div>
-                            <button className="btn-small" onClick={() => setSelectedSession(null)}>Fermer</button>
+                            <div className="flex gap-2">
+                                <button className="btn-secondary" onClick={markAllPresent}>✅ Tous Présents</button>
+                                <button className="btn-small" onClick={() => setSelectedSession(null)}>Fermer</button>
+                            </div>
                         </div>
                         <div className="table-container">
                             <table>
@@ -212,6 +234,7 @@ const FormateurDashboard = () => {
                                     <tr>
                                         <th>Participant</th>
                                         <th>Email</th>
+                                        <th>Absences (Formation)</th>
                                         <th>Statut</th>
                                         <th>Actions</th>
                                     </tr>
@@ -221,16 +244,18 @@ const FormateurDashboard = () => {
                                         const attendanceRecord = attendance.find(
                                             a => a.participant?._id === participant._id
                                         );
+                                        const absenceCount = stats[participant._id] || 0;
+                                        const isAtRisk = absenceCount >= 3;
 
                                         return (
-                                            <tr key={participant._id}>
+                                            <tr key={participant._id} className={isAtRisk ? 'bg-red-50' : ''}>
                                                 <td>
                                                     <div className="participant-info-cell">
                                                         <strong>{participant.name}</strong>
                                                         <button
                                                             className="btn-link"
                                                             onClick={async () => {
-                                                                const res = await api.get(`/formations/progress/${selectedSession.formation._id}/${participant._id}`);
+                                                                const res = await api.get(`/formations/progress/${selectedSession.formation._id}/user/${participant._id}`);
                                                                 const p = res.data;
                                                                 alert(`Progression de ${participant.name}:\n- Complétées: ${p.attendedSessions}\n- Manquées: ${p.missedSessions}\n- Restantes: ${p.remainingSessions}\n- Score: ${p.progress}%`);
                                                             }}
@@ -238,6 +263,11 @@ const FormateurDashboard = () => {
                                                     </div>
                                                 </td>
                                                 <td>{participant.email}</td>
+                                                <td>
+                                                    <span className={`font-bold ${isAtRisk ? 'text-red-600' : 'text-slate-600'}`}>
+                                                        {absenceCount} {isAtRisk && '⚠️'}
+                                                    </span>
+                                                </td>
                                                 <td>
                                                     <span className={`status-badge status-${attendanceRecord?.status || 'absent'}`}>
                                                         {attendanceRecord ? (

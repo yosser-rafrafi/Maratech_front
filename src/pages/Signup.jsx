@@ -38,6 +38,7 @@ const Signup = () => {
             if (result && result.success === false) {
                 setError(result.error);
             } else {
+                // Success - redirect to success page
                 navigate('/success');
             }
         } catch (err) {
@@ -95,8 +96,8 @@ const Signup = () => {
                 </div>
 
                 {/* Right Panel - Signup Form */}
-                <div className="w-full lg:w-2/5 flex flex-col bg-white p-6 md:p-12 lg:p-16 justify-center h-screen overflow-y-auto overflow-x-hidden">
-                    <div className="w-full max-w-md mx-auto flex flex-col justify-center min-h-full lg:min-h-0 py-8 lg:py-0">
+                <div className="w-full lg:w-2/5 flex flex-col bg-white p-4 md:p-12 lg:p-16 h-screen overflow-y-auto overflow-x-hidden">
+                    <div className="w-full max-w-md mx-auto flex flex-col justify-center min-h-full my-auto lg:justify-center lg:min-h-0 py-8 lg:py-0">
                         <div className="flex items-center gap-3 lg:hidden mb-8 text-primary">
                             <span className="material-symbols-outlined text-4xl">rocket_launch</span>
                             <span className="text-3xl font-black tracking-tight text-slate-900">ASTBA</span>

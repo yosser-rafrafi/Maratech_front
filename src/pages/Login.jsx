@@ -8,12 +8,25 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
     const [loading, setLoading] = useState(false);
 
     // Animation refs
     const mascotHeadRef = useRef(null);
     const eyeLeftRef = useRef(null);
     const eyeRightRef = useRef(null);
+
+    useEffect(() => {
+        const savedEmail = localStorage.getItem('rememberedEmail');
+        const savedPassword = localStorage.getItem('rememberedPassword');
+        if (savedEmail) {
+            setEmail(savedEmail);
+            if (savedPassword) {
+                setPassword(savedPassword);
+            }
+            setRememberMe(true);
+        }
+    }, []);
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -58,6 +71,14 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+
+        if (rememberMe) {
+            localStorage.setItem('rememberedEmail', email);
+            localStorage.setItem('rememberedPassword', password);
+        } else {
+            localStorage.removeItem('rememberedEmail');
+            localStorage.removeItem('rememberedPassword');
+        }
 
         try {
             console.log('Attempting login with:', email);
@@ -263,7 +284,12 @@ const Login = () => {
                             </div>
                             <div className="flex items-center justify-between py-1">
                                 <label className="flex items-center gap-2 cursor-pointer group">
-                                    <input className="w-5 h-5 rounded text-primary focus:ring-primary/20 bg-slate-50 border-2 border-slate-200" type="checkbox" />
+                                    <input
+                                        className="w-5 h-5 rounded text-primary focus:ring-primary/20 bg-slate-50 border-2 border-slate-200"
+                                        type="checkbox"
+                                        checked={rememberMe}
+                                        onChange={(e) => setRememberMe(e.target.checked)}
+                                    />
                                     <span className="text-sm font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">Remember me</span>
                                 </label>
                                 <a className="text-sm font-bold text-primary hover:text-accent-blue transition-colors" href="#">Forgot Password?</a>

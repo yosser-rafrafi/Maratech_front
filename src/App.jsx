@@ -10,6 +10,7 @@ import Successful from './pages/Successful';
 import Unsuccessful from './pages/Unsuccessful';
 import ResponsableDashboard from './pages/ResponsableDashboard';
 import Calendar from './pages/Calendar';
+import Profile from './pages/Profile';
 import './App.css';
 
 // Home redirect component
@@ -73,6 +74,15 @@ function App() {
             element={
               <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin']}>
                 <Calendar />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin']}>
+                <Profile />
               </PrivateRoute>
             }
           />

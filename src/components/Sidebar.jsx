@@ -31,7 +31,13 @@ const Sidebar = () => {
             </div>
 
             <div className="sidebar-user">
-                <div className="avatar">{user?.name?.charAt(0)}</div>
+                <div className="avatar">
+                    {user?.profileImage ? (
+                        <img src={user.profileImage} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                    ) : (
+                        user?.name?.charAt(0)
+                    )}
+                </div>
                 <div className="user-info">
                     <p className="user-name">{user?.name}</p>
                     <p className="user-role">{user?.role}</p>
@@ -39,6 +45,10 @@ const Sidebar = () => {
             </div>
 
             <nav className="sidebar-nav">
+                <Link to="/profile" className={`nav-link ${location.pathname === '/profile' ? 'active' : ''}`}>
+                    <span className="nav-icon">👤</span>
+                    Mon Profil
+                </Link>
                 {menuItems.map((item) => (
                     <Link
                         key={item.path}
