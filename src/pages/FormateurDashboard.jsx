@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 import Sidebar from '../components/Sidebar';
@@ -6,13 +7,11 @@ import './Dashboard.css';
 
 const FormateurDashboard = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [sessions, setSessions] = useState([]);
     const [assignedFormations, setAssignedFormations] = useState([]);
-    const [selectedSession, setSelectedSession] = useState(null);
-    const [attendance, setAttendance] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
-    const [stats, setStats] = useState({});
 
     useEffect(() => {
         const loadData = async () => {
@@ -38,59 +37,28 @@ const FormateurDashboard = () => {
             const mySessions = response.data.sessions.filter(
                 s => s.formateur?._id === user.id
             );
-            setSessions(mySessions);
+
+            // Filter to show only this week's sessions
+            const now = new Date();
+            const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() + mondayOffset);
+            weekStart.setHours(0, 0, 0, 0);
+
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            weekEnd.setHours(23, 59, 59, 999);
+
+            const thisWeekSessions = mySessions.filter(s => {
+                const sessionDate = new Date(s.date);
+                return sessionDate >= weekStart && sessionDate <= weekEnd;
+            });
+
+            setSessions(thisWeekSessions);
         } catch (error) {
             console.error('Error fetching sessions:', error);
         }
-    };
-
-    const fetchAttendance = async (sessionId) => {
-        try {
-            const response = await api.get(`/attendance/session/${sessionId}`);
-            setAttendance(response.data.attendance);
-            setStats(response.data.stats || {});
-        } catch (error) {
-            console.error('Error fetching attendance:', error);
-        }
-    };
-
-    const markAttendance = async (sessionId, participantId, status) => {
-        try {
-            await api.post('/attendance', {
-                session: sessionId,
-                participant: participantId,
-                status
-            });
-            fetchAttendance(sessionId);
-        } catch (error) {
-            alert(error.response?.data?.error || 'Error marking attendance');
-        }
-    };
-
-    const markAllPresent = async () => {
-        if (!selectedSession || !selectedSession.participants) return;
-        if (!window.confirm('Marquer tous les participants comme PRÉSENTS ?')) return;
-
-        try {
-            const participants = selectedSession.participants.map(p => p._id);
-            await api.post('/attendance/batch', {
-                session: selectedSession._id,
-                participants,
-                status: 'present'
-            });
-            fetchAttendance(selectedSession._id);
-            alert('Tout le monde est marqué présent !');
-        } catch (error) {
-            alert('Erreur lors du marquage groupé');
-        }
-    };
-
-    const viewSessionDetails = (session) => {
-        setSelectedSession(session);
-        fetchAttendance(session._id);
-        setTimeout(() => {
-            document.getElementById('attendance-section')?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
     };
 
     const filteredFormations = assignedFormations.filter(f =>
@@ -204,100 +172,17 @@ const FormateurDashboard = () => {
                                     </div>
                                     <p className="card-meta">Participants: <strong>{session.participants?.length}/{session.maxParticipants}</strong></p>
                                     <button
-                                        onClick={() => viewSessionDetails(session)}
+                                        onClick={() => navigate(`/attendance/${session._id}`)}
                                         className="btn-primary"
                                         style={{ marginTop: '16px', width: '100%' }}
                                     >
-                                        Gérer les présences
+                                        📋 Gérer les présences
                                     </button>
                                 </div>
                             ))}
                         </div>
                     )}
                 </section>
-
-                {selectedSession && (
-                    <section id="attendance-section" className="dashboard-section animation-fade-in">
-                        <div className="section-header">
-                            <div>
-                                <h2 style={{ marginBottom: '4px' }}>Feuille de Présence</h2>
-                                <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Session : {selectedSession.formation?.title}</p>
-                            </div>
-                            <div className="flex gap-2">
-                                <button className="btn-secondary" onClick={markAllPresent}>✅ Tous Présents</button>
-                                <button className="btn-small" onClick={() => setSelectedSession(null)}>Fermer</button>
-                            </div>
-                        </div>
-                        <div className="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Participant</th>
-                                        <th>Email</th>
-                                        <th>Absences (Formation)</th>
-                                        <th>Statut</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {selectedSession.participants?.map((participant) => {
-                                        const attendanceRecord = attendance.find(
-                                            a => a.participant?._id === participant._id
-                                        );
-                                        const absenceCount = stats[participant._id] || 0;
-                                        const isAtRisk = absenceCount >= 3;
-
-                                        return (
-                                            <tr key={participant._id} className={isAtRisk ? 'bg-red-50' : ''}>
-                                                <td>
-                                                    <div className="participant-info-cell">
-                                                        <strong>{participant.name}</strong>
-                                                        <button
-                                                            className="btn-link"
-                                                            onClick={async () => {
-                                                                const res = await api.get(`/formations/progress/${selectedSession.formation._id}/user/${participant._id}`);
-                                                                const p = res.data;
-                                                                alert(`Progression de ${participant.name}:\n- Complétées: ${p.attendedSessions}\n- Manquées: ${p.missedSessions}\n- Restantes: ${p.remainingSessions}\n- Score: ${p.progress}%`);
-                                                            }}
-                                                        >📊 Voir Progrès</button>
-                                                    </div>
-                                                </td>
-                                                <td>{participant.email}</td>
-                                                <td>
-                                                    <span className={`font-bold ${isAtRisk ? 'text-red-600' : 'text-slate-600'}`}>
-                                                        {absenceCount} {isAtRisk && '⚠️'}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span className={`status-badge status-${attendanceRecord?.status || 'absent'}`}>
-                                                        {attendanceRecord ? (
-                                                            attendanceRecord.status === 'present' ? 'Présent' :
-                                                                attendanceRecord.status === 'late' ? 'En retard' : 'Absent'
-                                                        ) : 'Non marqué'}
-                                                    </span>
-                                                </td>
-                                                <td className="action-buttons">
-                                                    <button
-                                                        onClick={() => markAttendance(selectedSession._id, participant._id, 'present')}
-                                                        className="btn-small btn-success"
-                                                    >Présent</button>
-                                                    <button
-                                                        onClick={() => markAttendance(selectedSession._id, participant._id, 'late')}
-                                                        className="btn-small btn-warning"
-                                                    >Retard</button>
-                                                    <button
-                                                        onClick={() => markAttendance(selectedSession._id, participant._id, 'absent')}
-                                                        className="btn-small btn-danger"
-                                                    >Absent</button>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                )}
             </main>
         </div>
     );

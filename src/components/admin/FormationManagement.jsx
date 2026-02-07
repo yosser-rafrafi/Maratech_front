@@ -12,8 +12,10 @@ const FormationManagement = () => {
         title: '',
         description: '',
         duration: '',
-        startDate: ''
+        startDate: '',
+        defaultFormateur: ''
     });
+    const [formateurs, setFormateurs] = useState([]);
 
     useEffect(() => {
         fetchFormations();
@@ -21,8 +23,12 @@ const FormationManagement = () => {
 
     const fetchFormations = async () => {
         try {
-            const res = await api.get('/formations');
-            setFormations(res.data.formations);
+            const [formationsRes, usersRes] = await Promise.all([
+                api.get('/formations'),
+                api.get('/admin/users')
+            ]);
+            setFormations(formationsRes.data.formations);
+            setFormateurs(usersRes.data.users.filter(u => u.role === 'formateur'));
         } catch (error) {
             console.error('Error fetching formations:', error);
         } finally {
@@ -40,7 +46,7 @@ const FormationManagement = () => {
             }
             setShowModal(false);
             setEditingFormation(null);
-            setFormData({ title: '', description: '', duration: '', startDate: '' });
+            setFormData({ title: '', description: '', duration: '', startDate: '', defaultFormateur: '' });
             fetchFormations();
         } catch (error) {
             alert(error.response?.data?.error || 'Error saving formation');
@@ -53,7 +59,8 @@ const FormationManagement = () => {
             title: formation.title,
             description: formation.description,
             duration: formation.duration,
-            startDate: formation.startDate.split('T')[0]
+            startDate: formation.startDate.split('T')[0],
+            defaultFormateur: formation.defaultFormateur?._id || ''
         });
         setShowModal(true);
     };
@@ -80,6 +87,17 @@ const FormationManagement = () => {
         }
     };
 
+    const [activeTab, setActiveTab] = useState('active'); // 'active' or 'archived'
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredFormations = formations.filter(f => {
+        const tabMatch = activeTab === 'active' ? f.active : !f.active;
+        const searchMatch = searchTerm === '' ||
+            f.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            f.description.toLowerCase().includes(searchTerm.toLowerCase());
+        return tabMatch && searchMatch;
+    });
+
     if (loading) return <div>Chargement...</div>;
 
     if (selectedFormation) {
@@ -89,7 +107,23 @@ const FormationManagement = () => {
     return (
         <div className="dashboard-section animation-fade-in">
             <div className="section-header">
-                <h2>Gestion des Formations</h2>
+                <div className="flex items-center gap-4">
+                    <h2>Gestion des Formations</h2>
+                    <div className="flex bg-slate-100 p-1 rounded-lg">
+                        <button
+                            className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${activeTab === 'active' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+                            onClick={() => setActiveTab('active')}
+                        >
+                            Actives
+                        </button>
+                        <button
+                            className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${activeTab === 'archived' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+                            onClick={() => setActiveTab('archived')}
+                        >
+                            Archives
+                        </button>
+                    </div>
+                </div>
                 <button
                     className="btn-primary"
                     onClick={() => {
@@ -102,27 +136,46 @@ const FormationManagement = () => {
                 </button>
             </div>
 
-            {formations.length === 0 ? (
+            <div className="mb-6">
+                <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+                    <input
+                        type="text"
+                        placeholder="Rechercher une formation..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                </div>
+            </div>
+
+            {filteredFormations.length === 0 ? (
                 <div className="text-center py-12 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
-                    <div className="text-4xl mb-4">🎓</div>
-                    <h3 className="text-xl font-semibold text-slate-700 mb-2">Aucune formation</h3>
+                    <div className="text-4xl mb-4">{activeTab === 'active' ? '🎓' : '🗄️'}</div>
+                    <h3 className="text-xl font-semibold text-slate-700 mb-2">
+                        {activeTab === 'active' ? 'Aucune formation active' : 'Aucune archive'}
+                    </h3>
                     <p className="text-slate-500 mb-6 max-w-md mx-auto">
-                        Commencez par créer votre première formation pour gérer le programme et les inscriptions.
+                        {activeTab === 'active'
+                            ? "Commencez par créer votre première formation pour gérer le programme et les inscriptions."
+                            : "Les formations archivées apparaîtront ici."}
                     </p>
-                    <button
-                        className="btn-primary"
-                        onClick={() => {
-                            setEditingFormation(null);
-                            setFormData({ title: '', description: '', duration: '', startDate: '' });
-                            setShowModal(true);
-                        }}
-                    >
-                        + Créer une Formation
-                    </button>
+                    {activeTab === 'active' && (
+                        <button
+                            className="btn-primary"
+                            onClick={() => {
+                                setEditingFormation(null);
+                                setFormData({ title: '', description: '', duration: '', startDate: '', defaultFormateur: '' });
+                                setShowModal(true);
+                            }}
+                        >
+                            + Créer une Formation
+                        </button>
+                    )}
                 </div>
             ) : (
                 <div className="cards-grid">
-                    {formations.map((formation) => (
+                    {filteredFormations.map((formation) => (
                         <div key={formation._id} className={`card group hover:shadow-lg transition-all duration-300 ${!formation.active ? 'opacity-75 bg-slate-50 border-slate-200' : 'bg-white border-slate-200'}`}>
                             <div className={`h-2 w-full rounded-t-xl mb-4 ${formation.active ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-slate-300'}`}></div>
 
@@ -237,6 +290,21 @@ const FormationManagement = () => {
                                         required
                                     />
                                 </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Formateur par défaut (optionnel)</label>
+                                <select
+                                    className="w-full p-2 border rounded-lg"
+                                    value={formData.defaultFormateur}
+                                    onChange={(e) => setFormData({ ...formData, defaultFormateur: e.target.value })}
+                                >
+                                    <option value="">Aucun (à définir par séance)</option>
+                                    {formateurs.map(f => (
+                                        <option key={f._id} value={f._id}>{f.name}</option>
+                                    ))}
+                                </select>
+                                <p className="text-xs text-slate-500 mt-1">Ce formateur sera automatiquement assigné aux nouvelles séances.</p>
                             </div>
 
                             <div className="flex gap-3 mt-6">

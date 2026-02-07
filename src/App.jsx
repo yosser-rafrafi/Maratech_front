@@ -11,6 +11,7 @@ import Unsuccessful from './pages/Unsuccessful';
 import ResponsableDashboard from './pages/ResponsableDashboard';
 import Calendar from './pages/Calendar';
 import Profile from './pages/Profile';
+import AttendancePage from './pages/AttendancePage';
 import './App.css';
 
 // Home redirect component
@@ -83,6 +84,15 @@ function App() {
             element={
               <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin']}>
                 <Profile />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/attendance/:sessionId"
+            element={
+              <PrivateRoute allowedRoles={['formateur', 'admin']}>
+                <AttendancePage />
               </PrivateRoute>
             }
           />

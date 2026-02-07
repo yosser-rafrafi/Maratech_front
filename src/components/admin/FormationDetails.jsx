@@ -15,10 +15,20 @@ const FormationDetails = ({ formation, onBack }) => {
     const [sessionData, setSessionData] = useState({
         date: '',
         startTime: '',
-        endTime: '',
+        duration: '2', // Duration in hours
         formateur: '',
         maxParticipants: 30
     });
+
+    const [showEnrollModal, setShowEnrollModal] = useState(false);
+    const [enrollUserId, setEnrollUserId] = useState('');
+    const [availableStudents, setAvailableStudents] = useState([]);
+
+    useEffect(() => {
+        if (showEnrollModal) {
+            fetchStudents();
+        }
+    }, [showEnrollModal]);
 
     useEffect(() => {
         fetchData();
@@ -50,8 +60,19 @@ const FormationDetails = ({ formation, onBack }) => {
     const handleSessionSubmit = async (e) => {
         e.preventDefault();
         try {
+            // Calculate endTime from startTime + duration
+            const [hours, minutes] = sessionData.startTime.split(':');
+            const startDate = new Date();
+            startDate.setHours(parseInt(hours), parseInt(minutes), 0);
+            startDate.setHours(startDate.getHours() + parseFloat(sessionData.duration));
+            const endTime = `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}`;
+
             const payload = {
-                ...sessionData,
+                date: sessionData.date,
+                startTime: sessionData.startTime,
+                endTime: endTime,
+                formateur: sessionData.formateur,
+                maxParticipants: sessionData.maxParticipants,
                 formation: formation._id,
                 level: selectedLevel._id
             };
@@ -64,7 +85,7 @@ const FormationDetails = ({ formation, onBack }) => {
 
             setShowSessionModal(false);
             setEditingSession(null);
-            setSessionData({ date: '', startTime: '', endTime: '', formateur: '', maxParticipants: 30 });
+            setSessionData({ date: '', startTime: '', duration: '2', formateur: '', maxParticipants: 30 });
             fetchData(); // Refresh list
         } catch (error) {
             alert(error.response?.data?.error || 'Erreur lors de l\'enregistrement');
@@ -86,16 +107,21 @@ const FormationDetails = ({ formation, onBack }) => {
         setSelectedLevel(level);
         if (session) {
             setEditingSession(session);
+            // Calculate duration from start and end times
+            const [startH, startM] = session.startTime.split(':').map(Number);
+            const [endH, endM] = session.endTime.split(':').map(Number);
+            const durationHours = (endH * 60 + endM - startH * 60 - startM) / 60;
+
             setSessionData({
                 date: session.date.split('T')[0],
                 startTime: session.startTime,
-                endTime: session.endTime,
+                duration: String(durationHours),
                 formateur: session.formateur?._id || '',
                 maxParticipants: session.maxParticipants
             });
         } else {
             setEditingSession(null);
-            setSessionData({ date: '', startTime: '', endTime: '', formateur: '', maxParticipants: 30 });
+            setSessionData({ date: '', startTime: '', duration: '2', formateur: '', maxParticipants: 30 });
         }
         setShowSessionModal(true);
     };
@@ -105,16 +131,6 @@ const FormationDetails = ({ formation, onBack }) => {
     };
 
     if (loading) return <div>Chargement des détails...</div>;
-
-    const [showEnrollModal, setShowEnrollModal] = useState(false);
-    const [enrollUserId, setEnrollUserId] = useState('');
-    const [availableStudents, setAvailableStudents] = useState([]);
-
-    useEffect(() => {
-        if (showEnrollModal) {
-            fetchStudents();
-        }
-    }, [showEnrollModal]);
 
     const fetchStudents = async () => {
         try {
@@ -332,14 +348,21 @@ const FormationDetails = ({ formation, onBack }) => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Fin</label>
-                                    <input
-                                        type="time"
+                                    <label className="block text-sm font-medium mb-1">Durée</label>
+                                    <select
                                         className="w-full p-2 border rounded-lg"
-                                        value={sessionData.endTime}
-                                        onChange={(e) => setSessionData({ ...sessionData, endTime: e.target.value })}
+                                        value={sessionData.duration}
+                                        onChange={(e) => setSessionData({ ...sessionData, duration: e.target.value })}
                                         required
-                                    />
+                                    >
+                                        <option value="1">1 heure</option>
+                                        <option value="1.5">1h30</option>
+                                        <option value="2">2 heures</option>
+                                        <option value="2.5">2h30</option>
+                                        <option value="3">3 heures</option>
+                                        <option value="3.5">3h30</option>
+                                        <option value="4">4 heures</option>
+                                    </select>
                                 </div>
                             </div>
 

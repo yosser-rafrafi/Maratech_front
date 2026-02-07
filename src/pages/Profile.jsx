@@ -1,71 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import api from '../config/api';
 import Sidebar from '../components/Sidebar';
-import './Dashboard.css'; // Re-use dashboard styles
+import api from '../config/api';
+import './Dashboard.css'; // Reuse dashboard styles
 
 const Profile = () => {
     const { user, setUser } = useAuth();
+    const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        profileImage: ''
+        name: user?.name || '',
+        email: user?.email || '',
+        password: ''
     });
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
 
-    useEffect(() => {
-        if (user) {
-            setFormData(prev => ({
-                ...prev,
-                name: user.name || '',
-                email: user.email || '',
-                profileImage: user.profileImage || ''
-            }));
-        }
-    }, [user]);
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            if (file.size > 100000) { // 100KB limit
-                return setMessage({ type: 'error', text: 'Image too large (max 100KB)' });
-            }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, profileImage: reader.result }));
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+    if (!user) return <div>Chargement...</div>;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setMessage({ type: '', text: '' });
-
         try {
-            const updateData = { ...formData };
-            if (!updateData.password) delete updateData.password;
+            const payload = { name: formData.name, email: formData.email };
+            if (formData.password) {
+                payload.password = formData.password;
+            }
 
-            const res = await api.put('/auth/me', updateData);
-
-            // Update local user context
-            const updatedUser = res.data.user;
-            localStorage.setItem('user', JSON.stringify(updatedUser));
-            if (setUser) setUser(updatedUser); // Assuming setUser is exposed from context, need to check AuthContext
-
-            setMessage({ type: 'success', text: 'Profile updated successfully!' });
+            const res = await api.put('/auth/profile', payload);
+            setUser(res.data.user);
+            setIsEditing(false);
+            setFormData({ ...formData, password: '' });
+            alert('Profil mis à jour avec succès');
         } catch (error) {
-            setMessage({ type: 'error', text: error.response?.data?.error || 'Update failed' });
-        } finally {
-            setLoading(false);
+            alert(error.response?.data?.error || 'Erreur lors de la mise à jour');
         }
+    };
+
+    const handleCancel = () => {
+        setFormData({ name: user.name, email: user.email, password: '' });
+        setIsEditing(false);
     };
 
     return (
@@ -75,86 +45,106 @@ const Profile = () => {
                 <header className="page-header">
                     <div>
                         <h1>Mon Profil</h1>
-                        <p>Gérez vos informations personnelles.</p>
+                        <p>Consultez et modifiez vos informations personnelles.</p>
                     </div>
                 </header>
 
-                <div className="dashboard-section" style={{ maxWidth: '600px' }}>
-
-                    {message.text && (
-                        <div className={`p-4 mb-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                            {message.text}
-                        </div>
-                    )}
-
-                    <div className="flex justify-center mb-6">
-                        <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-slate-200">
-                            {formData.profileImage ? (
-                                <img src={formData.profileImage} alt="Profile" className="w-full h-full object-cover" />
-                            ) : (
-                                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-2xl font-bold text-slate-400">
-                                    {formData.name?.charAt(0)}
+                <div className="max-w-2xl mx-auto">
+                    <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-8 animation-fade-in">
+                        <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-6">
+                                <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-3xl font-bold">
+                                    {user.name.charAt(0).toUpperCase()}
                                 </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold text-slate-800">{user.name}</h2>
+                                    <span className={`role-badge ${user.role} mt-2 inline-block`}>
+                                        {user.role === 'student' ? 'Étudiant' :
+                                            user.role === 'formateur' ? 'Formateur' :
+                                                user.role === 'Responsable' ? 'Responsable' : 'Administrateur'}
+                                    </span>
+                                </div>
+                            </div>
+                            {!isEditing && (
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="btn-primary"
+                                >
+                                    ✏️ Modifier
+                                </button>
                             )}
                         </div>
+
+                        {isEditing ? (
+                            <form onSubmit={handleSubmit} className="grid gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nom Complet</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Adresse Email</label>
+                                    <input
+                                        type="email"
+                                        className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nouveau Mot de Passe (optionnel)</label>
+                                    <input
+                                        type="password"
+                                        className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                        placeholder="Laissez vide pour ne pas changer"
+                                    />
+                                </div>
+
+                                <div className="flex gap-3 mt-4">
+                                    <button type="button" onClick={handleCancel} className="flex-1 btn-secondary">
+                                        Annuler
+                                    </button>
+                                    <button type="submit" className="flex-1 btn-primary justify-center">
+                                        Enregistrer
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            <div className="grid gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-500 mb-1">Nom Complet</label>
+                                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium">
+                                        {user.name}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-500 mb-1">Adresse Email</label>
+                                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium">
+                                        {user.email}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-500 mb-1">Statut du Compte</label>
+                                    <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800">
+                                        <span className={`w-2.5 h-2.5 rounded-full ${user.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                        <span className="font-medium capitalize">{user.status}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
-
-                    <form onSubmit={handleSubmit} className="form-card">
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Photo de Profil (Optionnel)</label>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageChange}
-                                className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                            />
-                            <p className="text-xs text-slate-400 mt-1">Max 100KB.</p>
-                        </div>
-
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Nom Complet</label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                className="w-full p-2 border rounded-lg"
-                                required
-                            />
-                        </div>
-
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="w-full p-2 border rounded-lg"
-                                required
-                            />
-                        </div>
-
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Nouveau Mot de Passe (Laisser vide pour conserver)</label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="w-full p-2 border rounded-lg"
-                                placeholder="******"
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="btn-primary w-full justify-center"
-                            disabled={loading}
-                        >
-                            {loading ? 'Mise à jour...' : 'Sauvegarder les modifications'}
-                        </button>
-                    </form>
                 </div>
             </main>
         </div>
