@@ -13,7 +13,7 @@ const Sidebar = () => {
     const menuItems = [
         {
             title: isAdmin ? 'Administration' : isFormateur ? 'Mes Sessions' : 'Gestion Formations',
-            path: isAdmin ? '/admin' : isFormateur ? '/formateur' : '/participant',
+            path: isAdmin ? '/admin' : isFormateur ? '/formateur' : '/responsable',
             icon: isAdmin ? '👥' : isFormateur ? '📅' : '🏗️'
         },
         {

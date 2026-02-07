@@ -26,7 +26,7 @@ const Home = () => {
   } else if (user.role === 'formateur') {
     return <Navigate to="/formateur" replace />;
   } else if (user.role === 'Responsable') {
-    return <Navigate to="/participant" replace />;
+    return <Navigate to="/responsable" replace />;
   } else {
     return <Navigate to="/login" replace />;
   }
@@ -60,7 +60,7 @@ function App() {
           />
 
           <Route
-            path="/participant"
+            path="/responsable"
             element={
               <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin']}>
                 <ResponsableDashboard />

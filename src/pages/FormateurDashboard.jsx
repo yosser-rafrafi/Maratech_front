@@ -230,9 +230,13 @@ const FormateurDashboard = () => {
                                                         <button
                                                             className="btn-link"
                                                             onClick={async () => {
-                                                                const res = await api.get(`/formations/progress/${selectedSession.formation._id}/${participant._id}`);
-                                                                const p = res.data;
-                                                                alert(`Progression de ${participant.name}:\n- Complétées: ${p.attendedSessions}\n- Manquées: ${p.missedSessions}\n- Restantes: ${p.remainingSessions}\n- Score: ${p.progress}%`);
+                                                                try {
+                                                                    const res = await api.get(`/formations/progress/${selectedSession.formation._id}/${participant._id}`);
+                                                                    const p = res.data;
+                                                                    alert(`Progression de ${participant.name}:\n- Complétées: ${p.attendedSessions}\n- Manquées: ${p.missedSessions}\n- Restantes: ${p.remainingSessions}\n- Score: ${p.progress}%`);
+                                                                } catch (err) {
+                                                                    alert('Erreur lors de la récupération de la progression');
+                                                                }
                                                             }}
                                                         >📊 Voir Progrès</button>
                                                     </div>
