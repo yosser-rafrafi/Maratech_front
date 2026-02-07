@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('user', JSON.stringify(user));
             setUser(user);
 
-            return { success: true };
+            return user;
         } catch (error) {
             return {
                 success: false,
@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('user', JSON.stringify(user));
             setUser(user);
 
-            return { success: true };
+            return user;
         } catch (error) {
             return {
                 success: false,

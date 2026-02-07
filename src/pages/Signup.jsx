@@ -32,8 +32,16 @@ const Signup = () => {
 
         try {
             const { confirmPassword, ...signupData } = formData;
-            await signup(signupData);
-            navigate('/login');
+            const user = await signup(signupData);
+
+            // Redirect based on role
+            if (user.role === 'admin') {
+                navigate('/admin');
+            } else if (user.role === 'formateur') {
+                navigate('/formateur');
+            } else {
+                navigate('/participant');
+            }
         } catch (err) {
             setError(err.response?.data?.error || 'Failed to create account');
         } finally {
