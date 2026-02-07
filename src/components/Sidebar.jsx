@@ -28,7 +28,7 @@ const Sidebar = () => {
             items: [
                 {
                     title: t('sidebar.dashboard'),
-                    path: isAdmin ? '/admin' : isFormateur ? '/formateur' : isResponsable ? '/responsable' : '/participant',
+                    path: isAdmin ? '/admin' : isFormateur ? '/formateur' : isResponsable ? '/participant' : isStudent ? '/student-dashboard' : '/participant',
                     icon: 'dashboard'
                 },
                 {

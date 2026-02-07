@@ -164,6 +164,7 @@ const Signup = () => {
                                         required
                                     >
                                         <option value="">{t('auth.role_select')}</option>
+                                        <option value="student">{t('auth.roles.student', { defaultValue: 'Student / Élève' })}</option>
                                         <option value="formateur">{t('auth.roles.formateur')}</option>
                                         <option value="Responsable">{t('auth.roles.responsable')}</option>
                                         <option value="admin">{t('auth.roles.admin')}</option>
