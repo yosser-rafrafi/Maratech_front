@@ -38,8 +38,13 @@ const Signup = () => {
             if (result && result.success === false) {
                 setError(result.error);
             } else {
-                // Success - redirect to success page
-                navigate('/success');
+                // Success
+                // Check if user is pending or approval is required (typically no token is returned or status is pending)
+                if (result?.status === 'pending' || result?.user?.status === 'pending' || (result?.success && !result.token)) {
+                    navigate('/pending-approval');
+                } else {
+                    navigate('/success');
+                }
             }
         } catch (err) {
             setError(err.response?.data?.error || 'Failed to create account');
@@ -158,7 +163,7 @@ const Signup = () => {
                                     >
                                         <option value="">Sélectionnez votre rôle</option>
                                         <option value="formateur">Formateur</option>
-                                        <option value="responsable">Responsable de formation (Entreprise)</option>
+                                        <option value="Responsable">Responsable de formation (Entreprise)</option>
                                         <option value="admin">Membre administratif</option>
                                     </select>
                                     <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>

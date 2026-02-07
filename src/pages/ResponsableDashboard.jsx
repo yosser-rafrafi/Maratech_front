@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 import Sidebar from '../components/Sidebar';
+import { StatCard, FormationDistributionChart, ProgressLineChart } from '../components/DashboardCharts';
 import './Dashboard.css';
 
 import FormationManagement from '../components/admin/FormationManagement';
@@ -52,33 +53,68 @@ const ResponsableDashboard = () => {
                     <div className="header-tabs">
                         <button className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Vue d'ensemble</button>
                         <button className={`tab-btn ${activeTab === 'formations' ? 'active' : ''}`} onClick={() => setActiveTab('formations')}>Formations</button>
-                        <button className={`tab-btn ${activeTab === 'students' ? 'active' : ''}`} onClick={() => setActiveTab('students')}>Étudiants</button>
+                        <button className={`tab-btn ${activeTab === 'students' ? 'active' : ''}`} onClick={() => setActiveTab('students')}>Élèves</button>
                         <button className={`tab-btn ${activeTab === 'certifications' ? 'active' : ''}`} onClick={() => setActiveTab('certifications')}>Certifications</button>
                     </div>
                 </header>
 
                 <div className="dashboard-grid">
                     {activeTab === 'overview' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                                <h3 className="text-slate-500 text-sm font-medium uppercase tracking-wider mb-2">Formations Actives</h3>
-                                <span className="text-4xl font-extrabold text-slate-900">{stats.formations}</span>
+                        <>
+                            {/* Key Metrics Row */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <StatCard
+                                    title="Formations Actives"
+                                    value={stats.formations}
+                                    icon="school"
+                                    color="#3b82f6"
+                                />
+                                <StatCard
+                                    title="Élèves Suivis"
+                                    value={stats.students}
+                                    icon="group"
+                                    color="#10b981"
+                                />
+                                <StatCard
+                                    title="Taux de Réussite"
+                                    value="92%"
+                                    icon="emoji_events"
+                                    color="#f59e0b"
+                                />
+                                <StatCard
+                                    title="Heures Totales"
+                                    value="1,240"
+                                    icon="schedule"
+                                    color="#8b5cf6"
+                                />
                             </div>
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                                <h3 className="text-slate-500 text-sm font-medium uppercase tracking-wider mb-2">Étudiants Suivis</h3>
-                                <span className="text-4xl font-extrabold text-slate-900">{stats.students}</span>
+
+                            {/* Charts Row */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Répartition des Élèves</h3>
+                                    <div className="h-64">
+                                        <FormationDistributionChart />
+                                    </div>
+                                </div>
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Progression Générale</h3>
+                                    <div className="h-64">
+                                        <ProgressLineChart />
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </>
                     )}
 
                     {activeTab === 'formations' && <FormationManagement />}
 
                     {activeTab === 'students' && !viewingStudent && (
                         <UserManagement
-                            allowedRoles={['student']}
+                            allowedRoles={['student', 'formateur']}
                             canApprove={false}
-                            title="Gestion des Étudiants"
-                            showRoleFilter={false} // Only students
+                            title="Gestion des Utilisateurs"
+                            showRoleFilter={true}
                             onViewDetails={setViewingStudent}
                         />
                     )}

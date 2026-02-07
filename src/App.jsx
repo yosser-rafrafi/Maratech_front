@@ -8,10 +8,12 @@ import FormateurDashboard from './pages/FormateurDashboard';
 import ParticipantDashboard from './pages/ParticipantDashboard';
 import Successful from './pages/Successful';
 import Unsuccessful from './pages/Unsuccessful';
+import PendingApproval from './pages/PendingApproval';
 import ResponsableDashboard from './pages/ResponsableDashboard';
 import Calendar from './pages/Calendar';
 import Profile from './pages/Profile';
 import AttendancePage from './pages/AttendancePage';
+
 import './App.css';
 
 // Home redirect component
@@ -30,6 +32,8 @@ const Home = () => {
   } else if (user.role === 'Responsable') {
     return <Navigate to="/participant" replace />;
   } else {
+    // If none of the above, check if pending or student
+    if (user.role === 'student') return <Navigate to="/participant" replace />;
     return <Navigate to="/login" replace />;
   }
 };
@@ -42,6 +46,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/pending-approval" element={<PendingApproval />} />
 
           <Route
             path="/admin"

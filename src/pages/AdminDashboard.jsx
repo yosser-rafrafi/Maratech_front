@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 import Sidebar from '../components/Sidebar';
+import { StatCard, AttendanceChart, FormationDistributionChart, ProgressLineChart } from '../components/DashboardCharts';
 import './Dashboard.css';
 
 import FormationManagement from '../components/admin/FormationManagement';
 import UserManagement from '../components/admin/UserManagement';
 import CertificationPanel from '../components/admin/CertificationPanel';
+import StudentDetails from '../components/admin/StudentDetails';
 
 const AdminDashboard = () => {
     const { user } = useAuth();
@@ -36,7 +38,7 @@ const AdminDashboard = () => {
                 <header className="page-header">
                     <div>
                         <h1>Espace Administratif</h1>
-                        <p>Gestion globale de la plateforme.</p>
+                        <p>Vue d'ensemble et analytiques de la plateforme.</p>
                     </div>
 
                     <div className="header-tabs">
@@ -49,32 +51,62 @@ const AdminDashboard = () => {
 
                 <div className="dashboard-grid">
                     {activeTab === 'overview' && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-8">
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                                <h3 className="text-slate-500 text-sm font-medium uppercase tracking-wider mb-2">Utilisateurs</h3>
-                                <div className="flex items-end gap-2">
-                                    <span className="text-4xl font-extrabold text-slate-900">{stats.users?.total || 0}</span>
-                                    {stats.users?.pending > 0 && (
-                                        <span className="text-sm text-yellow-600 font-bold mb-1 bg-yellow-50 px-2 py-0.5 rounded-full">{stats.users.pending} en attente</span>
-                                    )}
+                        <>
+                            {/* Key Metrics Row */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <StatCard
+                                    title="Utilisateurs Totaux"
+                                    value={stats.users?.total || 0}
+                                    icon="group"
+                                    color="#3b82f6"
+                                    trend={12}
+                                />
+                                <StatCard
+                                    title="En Attente"
+                                    value={stats.users?.pending || 0}
+                                    icon="person_alert"
+                                    color="#f59e0b"
+                                    trend={-5}
+                                />
+                                <StatCard
+                                    title="Formations Actives"
+                                    value={stats.formations || 0}
+                                    icon="school"
+                                    color="#8b5cf6"
+                                    trend={8}
+                                />
+                                <StatCard
+                                    title="Certificats"
+                                    value={stats.certificates || 0}
+                                    icon="workspace_premium"
+                                    color="#10b981"
+                                    trend={24}
+                                />
+                            </div>
+
+                            {/* Charts Row */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Répartition par Formation</h3>
+                                    <div className="h-64">
+                                        <FormationDistributionChart />
+                                    </div>
+                                </div>
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Activité de la Plateforme</h3>
+                                    <div className="h-64">
+                                        <ProgressLineChart />
+                                    </div>
                                 </div>
                             </div>
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                                <h3 className="text-slate-500 text-sm font-medium uppercase tracking-wider mb-2">Formations</h3>
-                                <span className="text-4xl font-extrabold text-slate-900">{stats.formations || 0}</span>
-                            </div>
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                                <h3 className="text-slate-500 text-sm font-medium uppercase tracking-wider mb-2">Certificats Délivrés</h3>
-                                <span className="text-4xl font-extrabold text-slate-900">{stats.certificates || 0}</span>
-                            </div>
-                        </div>
+                        </>
                     )}
 
                     {activeTab === 'formations' && <FormationManagement />}
 
                     {activeTab === 'users' && !viewingStudent && (
                         <UserManagement
-                            allowedRoles={['admin', 'responsable', 'formateur', 'student']}
+                            allowedRoles={['student', 'Responsable', 'formateur']}
                             canApprove={true}
                             title="Gestion des Utilisateurs"
                             onViewDetails={setViewingStudent}

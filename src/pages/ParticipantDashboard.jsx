@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 import Sidebar from '../components/Sidebar';
+import { StatCard, ProgressLineChart } from '../components/DashboardCharts';
 import './Dashboard.css';
 
 const ParticipantDashboard = () => {
@@ -75,15 +76,6 @@ const ParticipantDashboard = () => {
         }
     };
 
-    const unenrollFromSession = async (sessionId) => {
-        try {
-            await api.post(`/sessions/${sessionId}/unenroll`);
-            fetchSessions();
-        } catch (error) {
-            alert(error.response?.data?.error || 'Error unenrolling');
-        }
-    };
-
     if (loading) {
         return (
             <div className="dashboard-layout">
@@ -102,25 +94,38 @@ const ParticipantDashboard = () => {
             <main className="main-content">
                 <header className="page-header">
                     <div>
-                        <h1>Espace Responsable Formation</h1>
-                        <p>Inscrivez-vous aux sessions et suivez votre progression en temps réel.</p>
+                        <h1>Espace Apprenant</h1>
+                        <p>Suivez votre progression et inscrivez-vous aux sessions.</p>
                     </div>
                 </header>
 
-                <div className="stats-grid">
-                    <div className="stat-card">
-                        <div className="stat-icon" style={{ backgroundColor: '#e0f2fe', color: '#0ea5e9' }}>📚</div>
-                        <div className="stat-info">
-                            <h3>Inscriptions</h3>
-                            <div className="stat-value">{mySessions.length}</div>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-icon" style={{ backgroundColor: '#fef2f2', color: '#ef4444' }}>⚠️</div>
-                        <div className="stat-info">
-                            <h3>Séances Manquées</h3>
-                            <div className="stat-value">{missedSessions.length}</div>
-                        </div>
+                {/* Stats Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-6">
+                    <StatCard
+                        title="Formations Suivies"
+                        value={mySessions.length}
+                        icon="school"
+                        color="#0ea5e9"
+                    />
+                    <StatCard
+                        title="Séances Manquées"
+                        value={missedSessions.length}
+                        icon="event_busy"
+                        color="#ef4444"
+                    />
+                    <StatCard
+                        title="Taux de Complétion"
+                        value="45%"
+                        icon="donut_large"
+                        color="#10b981"
+                    />
+                </div>
+
+                {/* Progress Chart */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8">
+                    <h3 className="text-lg font-bold text-slate-800 mb-6">Votre Progression Globale</h3>
+                    <div className="h-64">
+                        <ProgressLineChart />
                     </div>
                 </div>
 

@@ -9,64 +9,104 @@ const Sidebar = () => {
     const isAdmin = user?.role === 'admin';
     const isFormateur = user?.role === 'formateur';
     const isResponsable = user?.role === 'Responsable';
+    const isStudent = user?.role === 'student' || user?.role === 'élève';
 
-    const menuItems = [
+    const getRoleLabel = (role) => {
+        const roles = {
+            admin: 'Administrateur',
+            formateur: 'Formateur',
+            Responsable: 'Responsable',
+            student: 'Élève',
+            'élève': 'Élève'
+        };
+        return roles[role] || role;
+    };
+
+    const navGroups = [
         {
-            title: isAdmin ? 'Administration' : isFormateur ? 'Mes Sessions' : 'Gestion Formations',
-            path: isAdmin ? '/admin' : isFormateur ? '/formateur' : '/participant',
-            icon: isAdmin ? '👥' : isFormateur ? '📅' : '🏗️'
+            label: 'Principal',
+            items: [
+                {
+                    title: 'Tableau de bord',
+                    path: isAdmin ? '/admin' : isFormateur ? '/formateur' : isResponsable ? '/responsable' : '/participant',
+                    icon: 'dashboard'
+                },
+                {
+                    title: 'Calendrier Global',
+                    path: '/calendar',
+                    icon: 'calendar_today'
+                }
+            ]
         },
         {
-            title: 'Calendrier Global',
-            path: '/calendar',
-            icon: '🗓️'
+            label: 'Personnel',
+            items: [
+                {
+                    title: 'Mon Profil',
+                    path: '/profile',
+                    icon: 'person'
+                }
+            ]
         }
     ];
 
     return (
-        <div className="sidebar">
+        <aside className="sidebar">
             <div className="sidebar-brand">
-                <span className="brand-logo">⚓</span>
+                <div className="brand-logo">
+                    <span className="material-symbols-outlined">anchor</span>
+                </div>
                 <h2>ASTBA</h2>
             </div>
 
-            <div className="sidebar-user">
-                <div className="avatar">
+            <div className="sidebar-user-card">
+                <div className="avatar-wrapper">
                     {user?.profileImage ? (
-                        <img src={user.profileImage} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                        <img src={user.profileImage} alt="Avatar" className="avatar-img" />
                     ) : (
-                        user?.name?.charAt(0)
+                        <div className="avatar-placeholder">
+                            {user?.name?.charAt(0).toUpperCase()}
+                        </div>
                     )}
                 </div>
-                <div className="user-info">
+                <div className="user-meta">
                     <p className="user-name">{user?.name}</p>
-                    <p className="user-role">{user?.role}</p>
+                    <span className={`role-tag ${user?.role}`}>
+                        {getRoleLabel(user?.role)}
+                    </span>
                 </div>
             </div>
 
             <nav className="sidebar-nav">
-                <Link to="/profile" className={`nav-link ${location.pathname === '/profile' ? 'active' : ''}`}>
-                    <span className="nav-icon">👤</span>
-                    Mon Profil
-                </Link>
-                {menuItems.map((item) => (
-                    <Link
-                        key={item.path}
-                        to={item.path}
-                        className={`nav-link ${location.pathname === item.path ? 'active' : ''}`}
-                    >
-                        <span className="nav-icon">{item.icon}</span>
-                        {item.title}
-                    </Link>
+                {navGroups.map((group, gIdx) => (
+                    <div key={gIdx} className="nav-group">
+                        <span className="nav-group-label">{group.label}</span>
+                        {group.items.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`nav-link ${location.pathname === item.path ? 'active' : ''}`}
+                            >
+                                <span className="material-symbols-outlined nav-symbol">
+                                    {item.icon}
+                                </span>
+                                <span className="nav-text">{item.title}</span>
+                                {location.pathname === item.path && (
+                                    <div className="active-indicator" />
+                                )}
+                            </Link>
+                        ))}
+                    </div>
                 ))}
             </nav>
 
             <div className="sidebar-footer">
-                <button onClick={logout} className="btn-sidebar-logout">
-                    <span className="nav-icon">🚪</span> Logout
+                <button onClick={logout} className="logout-btn">
+                    <span className="material-symbols-outlined">logout</span>
+                    <span>Déconnexion</span>
                 </button>
             </div>
-        </div>
+        </aside>
     );
 };
 

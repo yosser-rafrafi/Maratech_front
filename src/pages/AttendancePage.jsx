@@ -214,7 +214,7 @@ const AttendancePage = () => {
                             </span>
                             <input
                                 type="text"
-                                placeholder="Rechercher un étudiant..."
+                                placeholder="Rechercher un élève..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 style={{
@@ -256,7 +256,7 @@ const AttendancePage = () => {
                     {/* Participants List */}
                     <div style={{ background: 'white', borderRadius: '16px', padding: '24px', border: '2px solid #e2e8f0' }}>
                         <div style={{ marginBottom: '16px', color: '#64748b', fontSize: '13px' }}>
-                            Total validé : {Object.keys(localChanges).length} / {session.participants?.length || 0} étudiants
+                            Total validé : {Object.keys(localChanges).length} / {session.participants?.length || 0} élèves
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {filteredParticipants.map(participant => {
