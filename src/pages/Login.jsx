@@ -214,25 +214,25 @@ const Login = () => {
                 </div>
 
                 {/* Right Panel - Login Form */}
-                <div className="w-full lg:w-2/5 flex flex-col bg-white p-8 md:p-16 lg:p-20 justify-between h-screen overflow-hidden">
-                    <div className="flex flex-col">
-                        <div className="flex items-center gap-3 lg:hidden mb-12 text-primary">
+                <div className="w-full lg:w-2/5 flex flex-col bg-white p-6 md:p-12 lg:p-20 justify-center h-screen overflow-y-auto overflow-x-hidden">
+                    <div className="w-full max-w-md mx-auto flex flex-col justify-center min-h-full lg:min-h-0 py-8 lg:py-0">
+                        <div className="flex items-center gap-3 lg:hidden mb-8 text-primary">
                             <span className="material-symbols-outlined text-4xl">rocket_launch</span>
                             <span className="text-3xl font-black tracking-tight text-slate-900">ASTBA</span>
                         </div>
-                        <div className="mb-12">
-                            <h2 className="text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Portal Access</h2>
-                            <p className="text-lg text-slate-500">Secure authentication for STEM professionals.</p>
+                        <div className="mb-8 lg:mb-10">
+                            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Hello !<span className="wave">👋</span></h2>
+                            <p className="text-base md:text-lg text-slate-500">Welcome back to the ASTBA Portal.</p>
                         </div>
 
-                        <form className="space-y-6" onSubmit={handleSubmit}>
+                        <form className="space-y-5" onSubmit={handleSubmit}>
                             <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">Identification</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Identification</label>
                                 <div className="relative group">
-                                    <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">account_circle</span>
+                                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">account_circle</span>
                                     <input
                                         type="email"
-                                        className="w-full pl-14 pr-5 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-lg font-medium"
+                                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-base font-medium"
                                         placeholder="Username or Email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
@@ -241,12 +241,12 @@ const Login = () => {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">Access Key</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Access Key</label>
                                 <div className="relative group">
-                                    <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">key</span>
+                                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">key</span>
                                     <input
                                         type={showPassword ? "text" : "password"}
-                                        className="w-full pl-14 pr-14 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-lg font-medium"
+                                        className="w-full pl-12 pr-12 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary text-slate-900 placeholder:text-slate-400 transition-all text-base font-medium"
                                         placeholder="Password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
@@ -254,47 +254,54 @@ const Login = () => {
                                     />
                                     <button
                                         type="button"
-                                        className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors focus:outline-none"
                                         onClick={() => setShowPassword(!showPassword)}
                                     >
-                                        <span className="material-symbols-outlined">{showPassword ? 'visibility' : 'visibility_off'}</span>
+                                        <span className="material-symbols-outlined text-xl">{showPassword ? 'visibility' : 'visibility_off'}</span>
                                     </button>
                                 </div>
                             </div>
-                            <div className="flex items-center justify-between py-2">
-                                <label className="flex items-center gap-3 cursor-pointer group">
-                                    <input className="w-6 h-6 rounded-lg text-primary focus:ring-primary/20 bg-slate-50 border-2 border-slate-200" type="checkbox" />
-                                    <span className="text-base font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">Secure Session</span>
+                            <div className="flex items-center justify-between py-1">
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <input className="w-5 h-5 rounded text-primary focus:ring-primary/20 bg-slate-50 border-2 border-slate-200" type="checkbox" />
+                                    <span className="text-sm font-semibold text-slate-600 group-hover:text-slate-900 transition-colors">Remember me</span>
                                 </label>
-                                <a className="text-base font-bold text-primary hover:text-accent-blue transition-colors" href="#">Recovery</a>
+                                <a className="text-sm font-bold text-primary hover:text-accent-blue transition-colors" href="#">Forgot Password?</a>
                             </div>
                             <button
                                 type="submit"
-                                className="w-full login-btn-glow bg-primary hover:bg-accent-blue text-white font-extrabold py-5 rounded-2xl transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-3 text-xl"
+                                disabled={loading}
+                                className="w-full login-btn-glow bg-primary hover:bg-accent-blue text-white font-extrabold py-4 rounded-xl transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2 text-lg disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                <span>Log In</span>
-                                <span className="material-symbols-outlined text-2xl">arrow_forward</span>
+                                {loading ? (
+                                    <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                ) : (
+                                    <>
+                                        <span>Log In</span>
+                                        <span className="material-symbols-outlined text-xl">arrow_forward</span>
+                                    </>
+                                )}
                             </button>
                         </form>
 
-                        <div className="mt-10 text-center">
-                            <p className="text-base text-slate-500">
+                        <div className="mt-8 text-center">
+                            <p className="text-sm text-slate-500">
                                 Not a member yet?
                                 <Link to="/signup" className="text-primary font-extrabold hover:underline underline-offset-4 ml-1">Request Access</Link>
                             </p>
                         </div>
-                    </div>
 
-                    <div className="mt-12 pt-8 border-t border-slate-100">
-                        <div className="flex flex-wrap gap-6 text-sm text-slate-400 font-bold mb-6">
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Support</a>
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Policies</a>
-                            <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Compliance</a>
+                        <div className="mt-auto lg:mt-12 pt-8 border-t border-slate-100 w-full">
+                            <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-400 font-bold mb-4">
+                                <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Support</a>
+                                <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Policies</a>
+                                <a className="hover:text-primary transition-colors uppercase tracking-widest" href="#">Compliance</a>
+                            </div>
+                            <p className="text-[10px] text-center text-slate-400 uppercase tracking-[0.2em] leading-relaxed font-bold">
+                                © 2024 ASTBA. Science & Technology Business Association.
+                                <span className="block mt-1 text-slate-300">Global Certification Standard v2.4.0</span>
+                            </p>
                         </div>
-                        <p className="text-[11px] text-slate-400 uppercase tracking-[0.2em] leading-relaxed font-bold">
-                            © 2024 ASTBA. Science & Technology Business Association.
-                            <span className="block mt-1 text-slate-300">Global Certification Standard v2.4.0</span>
-                        </p>
                     </div>
                 </div>
             </div>
