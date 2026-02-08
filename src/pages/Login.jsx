@@ -304,7 +304,7 @@ const Login = () => {
 
                         {/* Color Blindness Accessibility */}
                         <div className="mt-6 flex justify-center">
-                            <ColorBlindnessSelector />
+                            <ColorBlindnessSelector direction="up" />
                         </div>
 
                         <div className="mt-auto lg:mt-12 pt-8 border-t border-slate-100 w-full">
