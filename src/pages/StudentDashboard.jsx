@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
-import StudentSidebar from '../components/StudentSidebar';
+import Sidebar from '../components/Sidebar';
 import { useTranslation } from 'react-i18next';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import './Dashboard.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -97,50 +98,27 @@ const StudentDashboard = () => {
         );
     }
 
+    const isRTL = i18n.language === 'ar' || i18n.language === 'tn';
+
     return (
-        <div className="flex min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
-            <StudentSidebar />
-
-            <main className="flex-1 ml-72">
-                <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-10 transition-colors">
-                    <h2 className="text-xl font-black text-slate-800 dark:text-white">Student Portal</h2>
-
-                    <div className="flex items-center gap-6">
-                        <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
-                            <button onClick={() => i18n.changeLanguage('en')} className={`px-4 py-1.5 text-xs font-black rounded-lg transition-all ${i18n.language === 'en' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600' : 'text-slate-400'}`}>EN</button>
-                            <button onClick={() => i18n.changeLanguage('fr')} className={`px-4 py-1.5 text-xs font-black rounded-lg transition-all ${i18n.language === 'fr' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600' : 'text-slate-400'}`}>FR</button>
-                        </div>
-
-                        <div className="flex items-center gap-3 pl-6 border-l border-slate-100 dark:border-slate-800">
-                            <div className="text-right">
-                                <p className="text-sm font-black text-slate-800 dark:text-white leading-none">{user?.name}</p>
-                                <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">
-                                    {totalProgress >= 100 ? 'Certified Member' : `Level ${Math.floor(totalProgress / 25) + 1} Student`}
-                                </span>
-                            </div>
-                            <div className="w-10 h-10 rounded-full border-2 border-emerald-500 p-0.5 shadow-lg shadow-emerald-500/10">
-                                <img src={`https://ui-avatars.com/api/?name=${user?.name}&background=6366f1&color=fff`} className="w-full h-full rounded-full object-cover" alt="avatar" />
-                            </div>
-                        </div>
+        <div className="dashboard-layout" dir={isRTL ? 'rtl' : 'ltr'}>
+            <Sidebar />
+            <main className="main-content">
+                <header className="page-header">
+                    <div className="text-start">
+                        <h1>{t('welcome_back', 'Ravi de vous revoir')}, {user?.name?.split(' ')[0]}! 👋</h1>
+                        <p>{totalProgress === 100 ? t('student_dashboard.completed_all', 'Félicitations ! Vous avez terminé toutes vos formations.') : t('student_dashboard.keep_going', 'Continuez votre excellent travail !')}</p>
                     </div>
                 </header>
 
-                <div className="p-10 max-w-7xl mx-auto space-y-10">
-                    <section>
-                        <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">
-                            {t('welcome_back', 'Ravi de vous revoir')}, {user?.name?.split(' ')[0]}! 👋
-                        </h1>
-                        <p className="text-slate-400 dark:text-slate-500 font-medium text-lg">
-                            {totalProgress === 100 ? "Félicitations ! Vous avez terminé toutes vos formations." : "Continuez votre excellent travail ! Vous faites des progrès remarquables."}
-                        </p>
-                    </section>
-
-                    <section className="grid grid-cols-4 gap-6">
-                        <SimpleStatCard icon="auto_stories" label="Mes Formations" value={data.stats.totalFormations} badge={data.stats.totalFormations > 0 ? "Active" : "Stable"} color="indigo" />
-                        <SimpleStatCard icon="verified_user" label="Niveaux Validés" value={`${validatedCount} / ${totalLevels || 0}`} badge="Progressing" color="emerald" />
-                        <SimpleStatCard icon="calendar_month" label="Absences" value={data.stats.totalMissedSessions} badge={data.stats.totalMissedSessions === 0 ? "Perfect" : "Caution"} color="amber" />
-                        <SimpleStatCard icon="workspace_premium" label="Statut Certif" value={data.formations.some(f => f.progress === 100) ? "Unlocked" : "Locked"} badge="Available" color="indigo" />
-                    </section>
+                <div className="animation-fade-in space-y-8">
+                    {/* Stats Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <SimpleStatCard icon="auto_stories" label={t('student_dashboard.my_formations', 'Mes Formations')} value={data.stats.totalFormations} badge={data.stats.totalFormations > 0 ? t('common.active', 'Active') : t('common.stable', 'Stable')} color="indigo" />
+                        <SimpleStatCard icon="verified_user" label={t('student_dashboard.validated_levels', 'Niveaux Validés')} value={`${validatedCount} / ${totalLevels || 0}`} badge={t('common.progressing', 'Progressing')} color="emerald" />
+                        <SimpleStatCard icon="calendar_month" label={t('student_dashboard.absences', 'Absences')} value={data.stats.totalMissedSessions} badge={data.stats.totalMissedSessions === 0 ? t('common.perfect', 'Perfect') : t('common.caution', 'Caution')} color="amber" />
+                        <SimpleStatCard icon="workspace_premium" label={t('student_dashboard.cert_status', 'Statut Certif')} value={data.formations.some(f => f.progress === 100) ? t('common.unlocked', 'Unlocked') : t('common.locked', 'Locked')} badge={t('common.available', 'Available')} color="indigo" />
+                    </div>
 
                     <div className="grid grid-cols-12 gap-8">
                         <div className="col-span-8 space-y-8">
@@ -148,7 +126,7 @@ const StudentDashboard = () => {
                             <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-sm border border-slate-50 dark:border-slate-800 relative overflow-hidden">
                                 <div className="flex items-center gap-2 mb-8">
                                     <div className="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
-                                    <h3 className="text-2xl font-black text-slate-800 dark:text-white">Ma Progression</h3>
+                                    <h3 className="text-2xl font-black text-slate-800 dark:text-white">{t('student_dashboard.my_progress', 'Ma Progression')}</h3>
                                 </div>
 
                                 <div className="flex items-center justify-between">
@@ -156,13 +134,13 @@ const StudentDashboard = () => {
                                         <Doughnut data={chartData} options={{ cutout: '80%', plugins: { legend: { display: false } } }} />
                                         <div className="absolute inset-0 flex flex-col items-center justify-center">
                                             <span className="text-4xl font-black text-slate-900 dark:text-white">{totalProgress}%</span>
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">Complété</span>
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">{t('common.completed', 'Complété')}</span>
                                         </div>
                                     </div>
 
-                                    <div className="flex-1 ml-16 space-y-8">
+                                    <div className="flex-1 ms-16 space-y-8">
                                         <div className="flex flex-col gap-4">
-                                            <p className="text-sm font-bold text-slate-800 dark:text-slate-300">Niveau d'expertise <span className="float-right text-slate-300 italic font-medium">Intermédiaire</span></p>
+                                            <p className="text-sm font-bold text-slate-800 dark:text-slate-300">{t('student_dashboard.expertise_level', 'Niveau d\'expertise')} <span className="float-end text-slate-300 italic font-medium">{t('common.intermediate', 'Intermédiaire')}</span></p>
                                             <div className="flex items-center gap-3">
                                                 <LevelStep label="LVL 1" active={totalProgress >= 25} />
                                                 <LevelStep label="LVL 2" active={totalProgress >= 50} pulse={totalProgress >= 25 && totalProgress < 75} />
@@ -172,8 +150,8 @@ const StudentDashboard = () => {
                                         </div>
 
                                         <div className="flex gap-4">
-                                            <MiniMetric icon="verified" value={validatedCount} label="Validés" sublabel="Modules" color="indigo" />
-                                            <MiniMetric icon="pending_actions" value={inProgressCount} label="En cours" sublabel="Modules" color="amber" />
+                                            <MiniMetric icon="verified" value={validatedCount} label={t('common.validated', 'Validés')} sublabel={t('common.modules', 'Modules')} color="indigo" />
+                                            <MiniMetric icon="pending_actions" value={inProgressCount} label={t('common.in_progress', 'En cours')} sublabel={t('common.modules', 'Modules')} color="amber" />
                                         </div>
                                     </div>
                                 </div>
@@ -193,7 +171,7 @@ const StudentDashboard = () => {
                                         </div>
                                         <div className="text-right">
                                             <p className="text-5xl font-black text-indigo-600">{featuredFormation.progress}%</p>
-                                            <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Complété</p>
+                                            <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">{t('common.completed', 'Complété')}</p>
                                         </div>
                                     </div>
 
@@ -206,64 +184,64 @@ const StudentDashboard = () => {
 
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
-                                            <div className="flex -space-x-3">
+                                            <div className="flex -space-x-3 rtl:space-x-reverse">
                                                 {[1, 2, 3].map(i => (
                                                     <div key={i} className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold">JD</div>
                                                 ))}
                                                 <div className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-indigo-500 text-white flex items-center justify-center text-[10px] font-bold">+12</div>
                                             </div>
-                                            <span className="text-xs font-bold text-slate-400">apprenants inscrits</span>
+                                            <span className="text-xs font-bold text-slate-400">{t('student_dashboard.enrolled_learners', 'apprenants inscrits')}</span>
                                         </div>
                                         {featuredFormation.progress === 100 && (
                                             <button className="flex items-center gap-3 px-8 py-3.5 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95">
                                                 <span className="material-symbols-outlined text-xl">download</span>
-                                                Télécharger le Certificat
+                                                {t('student_dashboard.download_certificate', 'Télécharger le Certificat')}
                                             </button>
                                         )}
                                     </div>
                                 </div>
                             )}
 
-                            <h3 className="text-2xl font-black text-slate-800 dark:text-white">Quick Actions</h3>
+                            <h3 className="text-2xl font-black text-slate-800 dark:text-white">{t('student_dashboard.quick_actions', 'Quick Actions')}</h3>
                             <div className="grid grid-cols-3 gap-6">
                                 <Link to="/student-history" state={{ tab: 'attended' }}>
-                                    <ActionCard icon="history_edu" label="Sessions Attended" color="indigo" />
+                                    <ActionCard icon="history_edu" label={t('student_dashboard.sessions_attended', 'Sessions Attended')} color="indigo" />
                                 </Link>
                                 <Link to="/student-history" state={{ tab: 'missed' }}>
-                                    <ActionCard icon="event_busy" label="Missed Sessions" color="amber" />
+                                    <ActionCard icon="event_busy" label={t('student_dashboard.missed_sessions', 'Missed Sessions')} color="amber" />
                                 </Link>
                                 <Link to="/student-formations">
-                                    <ActionCard icon="military_tech" label="View Certificates" color="emerald" />
+                                    <ActionCard icon="military_tech" label={t('student_dashboard.view_certificates', 'View Certificates')} color="emerald" />
                                 </Link>
                             </div>
                         </div>
 
                         <div className="col-span-4 space-y-8">
                             <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-sm border border-slate-50 dark:border-slate-800">
-                                <h3 className="text-xl font-black text-slate-800 dark:text-white mb-8">Recent Activity</h3>
+                                <h3 className="text-xl font-black text-slate-800 dark:text-white mb-8">{t('student_dashboard.recent_activity', 'Recent Activity')}</h3>
                                 <div className="space-y-10 relative">
-                                    <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-slate-100 dark:bg-slate-800"></div>
+                                    <div className="absolute start-4 top-2 bottom-2 w-0.5 bg-slate-100 dark:bg-slate-800"></div>
 
                                     <TimelineItem
                                         icon={latestAttended ? "check" : "pending"}
-                                        status="LAST ATTENDED"
-                                        title={latestAttended?.title || "Aucune session"}
-                                        time={latestAttended ? `${new Date(latestAttended.date).toLocaleDateString()} • ${latestAttended.formationTitle || ''}` : "Aucune donnée de présence."}
+                                        status={t('student_dashboard.last_attended_status', 'LAST ATTENDED')}
+                                        title={latestAttended?.title || t('student_dashboard.no_session', 'Aucune session')}
+                                        time={latestAttended ? `${new Date(latestAttended.date).toLocaleDateString()} • ${latestAttended.formationTitle || ''}` : t('student_dashboard.no_attendance_data', 'Aucune donnée de présence.')}
                                         color={latestAttended ? "emerald" : "slate"}
                                     />
 
                                     <TimelineItem
                                         icon={latestMissed ? "close" : "verified"}
-                                        status="LAST MISSED"
-                                        title={latestMissed?.title || "Félicitations"}
-                                        subtitle={latestMissed ? new Date(latestMissed.date).toLocaleDateString() : "Aucune absence enregistrée."}
+                                        status={t('student_dashboard.last_missed_status', 'LAST MISSED')}
+                                        title={latestMissed?.title || t('student_dashboard.congratulations', 'Félicitations')}
+                                        subtitle={latestMissed ? new Date(latestMissed.date).toLocaleDateString() : t('student_dashboard.no_missed_sessions_data', 'Aucune absence enregistrée.')}
                                         color={latestMissed ? "amber" : "emerald"}
                                     />
                                 </div>
                             </div>
 
                             <div className="space-y-4">
-                                <h3 className="text-xl font-black text-slate-800 dark:text-white">Next Session</h3>
+                                <h3 className="text-xl font-black text-slate-800 dark:text-white">{t('student_dashboard.next_session', 'Next Session')}</h3>
                                 {nextSession ? (
                                     <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 shadow-xl border border-slate-50 dark:border-slate-800 relative group overflow-hidden">
                                         <div className="flex items-center gap-2 mb-6">
@@ -271,7 +249,7 @@ const StudentDashboard = () => {
                                             <span className="px-3 py-1 bg-amber-50 dark:bg-amber-900/30 text-[10px] font-black text-amber-600 rounded-lg uppercase tracking-widest border border-amber-100 dark:border-amber-800/50">Live Session</span>
                                         </div>
 
-                                        <h4 className="text-2xl font-black text-slate-800 dark:text-white leading-tight mb-4 pr-10">{nextSession.title}</h4>
+                                        <h4 className="text-2xl font-black text-slate-800 dark:text-white leading-tight mb-4 pe-10">{nextSession.title}</h4>
 
                                         <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm mb-8">
                                             <span className="material-symbols-outlined text-lg">calendar_today</span>
@@ -281,16 +259,16 @@ const StudentDashboard = () => {
                                         <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl mb-8 border border-slate-100 dark:border-slate-800">
                                             <img src={`https://ui-avatars.com/api/?name=${nextSession.formateur || 'T'}&background=random`} className="w-10 h-10 rounded-xl object-cover" alt="trainer" />
                                             <div>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Trainer</p>
-                                                <p className="text-sm font-black text-slate-800 dark:text-white">{nextSession.formateur || 'Staff ASTBA'}</p>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('student_dashboard.trainer', 'Trainer')}</p>
+                                                <p className="text-sm font-black text-slate-800 dark:text-white">{nextSession.formateur || t('common.staff_astba', 'Staff ASTBA')}</p>
                                             </div>
                                         </div>
 
                                         <h4 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors">
-                                            {session.title}
+                                            {nextSession.title}
                                         </h4>
                                         <p className="text-slate-500 text-sm mb-6 line-clamp-2">
-                                            {session.description || 'Session de formation pratique et théorique.'}
+                                            {nextSession.description || t('student_dashboard.default_session_desc', 'Session de formation pratique et théorique.')}
                                         </p>
 
                                         <div className="space-y-3 mb-6">
@@ -301,7 +279,7 @@ const StudentDashboard = () => {
                                                 <div>
                                                     <p className="text-xs text-slate-400 font-medium">{t('student_dashboard.date_time')}</p>
                                                     <p className="text-sm font-semibold">
-                                                        {new Date(session.date).toLocaleDateString()} • {session.startTime} - {session.endTime}
+                                                        {new Date(nextSession.date).toLocaleDateString()} • {nextSession.startTime} - {nextSession.endTime}
                                                     </p>
                                                 </div>
                                             </div>
@@ -312,19 +290,19 @@ const StudentDashboard = () => {
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-slate-400 font-medium">{t('student_dashboard.trainer')}</p>
-                                                    <p className="text-sm font-semibold">{session.formateur}</p>
+                                                    <p className="text-sm font-semibold">{nextSession.formateur}</p>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <button className="w-full py-2.5 rounded-xl bg-slate-50 text-slate-600 font-medium hover:bg-blue-600 hover:text-white transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-blue-200">
                                             <span>{t('student_dashboard.view_details')}</span>
-                                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                            <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
                                         </button>
                                     </div>
                                 ) : (
                                     <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 text-center text-slate-400 italic border border-dashed border-slate-200 dark:border-slate-800">
-                                        Pas de séance prévue prochainement.
+                                        {t('student_dashboard.no_upcoming_session', 'Pas de séance prévue prochainement.')}
                                     </div>
                                 )}
                             </div>
@@ -346,7 +324,7 @@ const SimpleStatCard = ({ icon, label, value, badge, color }) => {
     };
     return (
         <div className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-sm border border-slate-50 dark:border-slate-800 relative overflow-hidden group hover:shadow-lg transition-all">
-            <div className="absolute top-6 right-6 px-3 py-1 bg-slate-50 dark:bg-slate-800 text-[10px] font-black text-slate-400 rounded-lg uppercase tracking-widest border border-slate-100 dark:border-slate-800 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-colors">
+            <div className="absolute top-6 end-6 px-3 py-1 bg-slate-50 dark:bg-slate-800 text-[10px] font-black text-slate-400 rounded-lg uppercase tracking-widest border border-slate-100 dark:border-slate-800 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-colors">
                 {badge}
             </div>
             <div className={`w-12 h-12 ${theme[color]} rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg rotate-3 group-hover:rotate-0 transition-transform`}>
@@ -359,7 +337,7 @@ const SimpleStatCard = ({ icon, label, value, badge, color }) => {
 };
 
 const LevelStep = ({ label, active, pulse }) => (
-    <div className="flex-1 text-center group">
+    <div className="flex-1 text-start group">
         <div className={`h-1.5 rounded-full mb-3 transition-all ${active ? 'bg-indigo-600' : 'bg-slate-100 dark:bg-slate-800'} ${pulse ? 'animate-pulse ring-4 ring-indigo-500/20' : ''}`}></div>
         <p className={`text-[10px] font-black tracking-widest ${active ? 'text-indigo-600' : 'text-slate-300'}`}>{label}</p>
     </div>
@@ -400,7 +378,7 @@ const ActionCard = ({ icon, label, color }) => {
         emerald: "text-emerald-600 bg-emerald-50/50 hover:bg-emerald-600 hover:text-white shadow-emerald-600/5"
     };
     return (
-        <div className={`bg-white dark:bg-slate-900 p-6 rounded-[1.5rem] shadow-sm border border-slate-50 dark:border-slate-800 flex flex-col items-center justify-center gap-4 transition-all group cursor-pointer hover:-translate-y-1 ${theme[color]}`}>
+        <div className={`bg-white dark:bg-slate-900 p-6 rounded-[1.5rem] shadow-sm border border-slate-50 dark:border-slate-800 flex flex-col items-start justify-center gap-4 transition-all group cursor-pointer hover:-translate-y-1 ${theme[color]}`}>
             <span className="material-symbols-outlined text-3xl group-hover:scale-110 transition-transform">{icon}</span>
             <span className="text-xs font-black text-slate-800 dark:text-slate-200 group-hover:text-white tracking-tight">{label}</span>
         </div>

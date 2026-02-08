@@ -7,7 +7,7 @@
 
 .main-content {
     flex: 1;
-    margin-left: var(--sidebar-width);
+    margin-inline-start: var(--sidebar-width);
     padding: 40px;
     max-width: calc(100vw - var(--sidebar-width));
 }
@@ -131,7 +131,7 @@
 table {
     width: 100%;
     border-collapse: collapse;
-    text-align: left;
+    text-align: start;
 }
 
 th {
@@ -255,6 +255,8 @@ tr:hover td {
 .search-input {
     width: 100%;
     padding: 12px 16px 12px 44px;
+    padding-inline-start: 44px;
+    padding-inline-end: 16px;
     border: 1px solid var(--border-color);
     border-radius: 12px;
     font-size: 14px;
@@ -270,7 +272,7 @@ tr:hover td {
 
 .search-icon {
     position: absolute;
-    left: 16px;
+    inset-inline-start: 16px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
@@ -336,7 +338,7 @@ tr:hover td {
     padding: 12px 16px;
     background: #fff5f5;
     border-radius: 10px;
-    border-left: 4px solid #ef4444;
+    border-inline-start: 4px solid #ef4444;
 }
 
 .missed-info {

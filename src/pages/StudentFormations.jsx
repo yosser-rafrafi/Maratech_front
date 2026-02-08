@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
-import StudentSidebar from '../components/StudentSidebar';
+import Sidebar from '../components/Sidebar';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import './Dashboard.css';
 
 const StudentFormations = () => {
     const { user } = useAuth();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const isRTL = i18n.language === 'ar' || i18n.language === 'tn';
     const [loading, setLoading] = useState(true);
     const [formations, setFormations] = useState([]);
 
@@ -46,30 +48,13 @@ const StudentFormations = () => {
     }
 
     return (
-        <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
-            <StudentSidebar />
-
-            <main className="flex-1 ml-64 p-8">
-                <header className="mb-10 relative">
-                    <div className="relative z-10">
-                        <h1 className="text-3xl font-bold tracking-tight mb-2">
-                            My Formations
-                        </h1>
-                        <p className="text-slate-500 dark:text-slate-400">
-                            Track your progress across all enrolled courses.
-                        </p>
-                    </div>
-                    {/* Glassmorphism Background Effect */}
-                    <div className="absolute top-0 right-0 -z-0 opacity-10 dark:opacity-20 pointer-events-none">
-                        <svg fill="none" height="150" viewBox="0 0 200 150" width="200" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="150" cy="50" fill="url(#paint0_radial)" r="80"></circle>
-                            <defs>
-                                <radialGradient cx="0" cy="0" gradientTransform="translate(150 50) rotate(90) scale(80)" gradientUnits="userSpaceOnUse" id="paint0_radial" r="1">
-                                    <stop stopColor="#6366f1"></stop>
-                                    <stop offset="1" stopColor="#6366f1" stopOpacity="0"></stop>
-                                </radialGradient>
-                            </defs>
-                        </svg>
+        <div className="dashboard-layout" dir={isRTL ? 'rtl' : 'ltr'}>
+            <Sidebar />
+            <main className="main-content">
+                <header className="page-header">
+                    <div>
+                        <h1>{t('student_dashboard.my_formations', 'Mes Formations')}</h1>
+                        <p>{t('student_dashboard.track_progress', 'Suivez votre progression dans tous vos cours.')}</p>
                     </div>
                 </header>
 
@@ -79,8 +64,8 @@ const StudentFormations = () => {
                             <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <span className="material-symbols-outlined text-3xl text-slate-400">school</span>
                             </div>
-                            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2">No Formations Found</h3>
-                            <p className="text-slate-500">You are not currently enrolled in any formations.</p>
+                            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-2">{t('student_dashboard.no_formations_found', 'No Formations Found')}</h3>
+                            <p className="text-slate-500">{t('student_dashboard.no_formations', 'You are not currently enrolled in any formations.')}</p>
                         </div>
                     ) : (
                         formations.map(formation => {
@@ -96,14 +81,14 @@ const StudentFormations = () => {
                                     </div>
 
                                     {/* Content */}
-                                    <div className="flex-1 w-full text-center md:text-left">
+                                    <div className="flex-1 w-full text-center md:text-start">
                                         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{formation.title}</h3>
 
                                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm mb-4">
                                             <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                                                 <span className="material-symbols-outlined text-emerald-500">check_circle</span>
                                                 <span className="font-medium">
-                                                    {validatedCount} / {totalLevels} Levels Validated
+                                                    {validatedCount} / {totalLevels} {t('student_dashboard.validated_levels', 'Levels Validated')}
                                                 </span>
                                             </div>
 
@@ -111,7 +96,7 @@ const StudentFormations = () => {
                                                 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                                                 : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'
                                                 }`}>
-                                                {isCompleted ? 'Completed' : 'In Progress'}
+                                                {isCompleted ? t('common.completed', 'Completed') : t('common.in_progress', 'In Progress')}
                                             </span>
                                         </div>
 
@@ -123,14 +108,14 @@ const StudentFormations = () => {
                                                 style={{ width: `${formation.progress}%` }}
                                             ></div>
                                         </div>
-                                        <p className="text-xs text-right text-slate-500">{formation.progress}% Completed</p>
+                                        <p className="text-xs text-start rtl:text-end text-slate-500">{formation.progress}% {t('common.completed', 'Completed')}</p>
                                     </div>
 
                                     {/* Action Button */}
                                     <div className="shrink-0 w-full md:w-auto">
                                         <Link to={`/student-formation/${formation._id}`} className="w-full md:w-auto px-6 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-xl transition-colors flex items-center justify-center gap-2">
-                                            View Details
-                                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                            {t('student_dashboard.view_details', 'View Details')}
+                                            <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
                                         </Link>
                                     </div>
                                 </div>

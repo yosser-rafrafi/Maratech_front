@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../config/api';
-import StudentSidebar from '../components/StudentSidebar';
+import Sidebar from '../components/Sidebar';
+import { useTranslation } from 'react-i18next';
 
 const StudentAttendedSessions = () => {
+    const { t, i18n } = useTranslation();
+    const isRTL = i18n.language === 'ar' || i18n.language === 'tn';
     const [loading, setLoading] = useState(true);
     const [attendedSessions, setAttendedSessions] = useState([]);
 
@@ -11,8 +14,6 @@ const StudentAttendedSessions = () => {
         const fetchAttendedSessions = async () => {
             try {
                 const response = await api.get('/student/dashboard');
-                // Filter sessions where attendance is present
-                // We need to look at all formations' sessions and filter by attendanceStatus
                 const allSessions = [];
                 response.data.formations.forEach(f => {
                     if (f.sessions) {
@@ -27,7 +28,6 @@ const StudentAttendedSessions = () => {
                     }
                 });
 
-                // Sort by date descending (most recent first)
                 allSessions.sort((a, b) => new Date(b.date) - new Date(a.date));
                 setAttendedSessions(allSessions);
             } catch (error) {
@@ -49,25 +49,25 @@ const StudentAttendedSessions = () => {
     }
 
     return (
-        <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
-            <StudentSidebar />
+        <div className="dashboard-layout" dir={isRTL ? 'rtl' : 'ltr'}>
+            <Sidebar />
 
-            <main className="flex-1 ml-64 p-8">
+            <main className="main-content">
                 <header className="mb-10">
                     <Link to="/student-dashboard" className="inline-flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors mb-4">
-                        <span className="material-symbols-outlined text-sm">arrow_back</span>
-                        Back to Dashboard
+                        <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_back</span>
+                        {t('common.back_to_dashboard', 'Back to Dashboard')}
                     </Link>
                     <h1 className="text-3xl font-bold tracking-tight mb-2 flex items-center gap-3">
                         <span className="material-symbols-outlined text-emerald-500 text-4xl">check_circle</span>
-                        Attended Sessions
+                        {t('student_dashboard.sessions_attended', 'Attended Sessions')}
                     </h1>
                 </header>
 
                 {attendedSessions.length === 0 ? (
                     <div className="bg-white dark:bg-slate-800 p-12 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 text-center">
                         <p className="text-slate-500 dark:text-slate-400">
-                            No attended sessions found yet.
+                            {t('student_dashboard.no_attended', 'No attended sessions found yet.')}
                         </p>
                     </div>
                 ) : (
@@ -79,24 +79,24 @@ const StudentAttendedSessions = () => {
                                         <span className="material-symbols-outlined text-2xl">event_available</span>
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{session.title || 'Session'}</h3>
+                                        <h3 className="font-bold text-lg text-slate-900 dark:text-white">{session.title || t('common.session', 'Session')}</h3>
                                         <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400 mt-1">
                                             <span className="font-medium text-indigo-600 dark:text-indigo-400">{session.formationTitle}</span>
                                             <span>•</span>
-                                            <span>{session.level?.title || 'Level'}</span>
+                                            <span>{session.level?.title || t('common.level', 'Level')}</span>
                                             <span>•</span>
-                                            <span>{new Date(session.date).toLocaleDateString()}</span>
+                                            <span>{new Date(session.date).toLocaleDateString(i18n.language)}</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-4">
                                     <span className="px-3 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs font-bold uppercase rounded-full">
-                                        Present
+                                        {t('common.present', 'Present')}
                                     </span>
                                     <Link to={`/student-session/${session._id}`} className="px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-sm font-bold rounded-lg transition-colors flex items-center gap-2">
-                                        View Details
-                                        <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                                        {t('common.view_details', 'View Details')}
+                                        <span className="material-symbols-outlined text-xs rtl:rotate-180">arrow_forward</span>
                                     </Link>
                                 </div>
                             </div>
