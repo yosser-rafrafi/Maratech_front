@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import RobotMascot from '../components/RobotMascot';
+import LanguageSelector from '../components/LanguageSelector';
 
 const Signup = () => {
     const { signup } = useAuth();
@@ -57,6 +58,11 @@ const Signup = () => {
 
     return (
         <div className="bg-background-light min-h-screen flex items-center justify-center font-display overflow-hidden">
+            {/* Language Selector - Top Right Corner */}
+            <div className="fixed top-6 right-6 z-50">
+                <LanguageSelector />
+            </div>
+
             <div className="flex h-screen w-full overflow-hidden">
                 {/* Left Panel - Hidden on mobile */}
                 <div className="hidden lg:flex lg:w-3/5 relative overflow-hidden tech-bg">

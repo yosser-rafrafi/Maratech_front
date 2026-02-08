@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
+import ColorBlindnessSelector from './ColorBlindnessSelector';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -128,6 +129,12 @@ const Sidebar = () => {
                         ))}
                     </div>
                 </div>
+
+                {/* Color Blindness Accessibility */}
+                <div className="accessibility-section">
+                    <ColorBlindnessSelector direction="up" />
+                </div>
+
                 <button onClick={logout} className="logout-btn">
                     <span className="material-symbols-outlined">logout</span>
                     <span>{t('sidebar.logout')}</span>

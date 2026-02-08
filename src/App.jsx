@@ -19,6 +19,7 @@ import StudentFormationDetails from './pages/StudentFormationDetails';
 import StudentHistory from './pages/StudentHistory';
 import StudentSessionDetails from './pages/StudentSessionDetails';
 import { AccessibilityProvider } from './context/AccessibilityContext';
+import { ColorBlindnessProvider } from './context/ColorBlindnessContext';
 import AccessibilityWidget from './components/AccessibilityWidget';
 
 import './App.css';
@@ -47,131 +48,133 @@ const Home = () => {
 
 function App() {
   return (
-    <AccessibilityProvider>
-      <Router>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/pending-approval" element={<PendingApproval />} />
+    <ColorBlindnessProvider>
+      <AccessibilityProvider>
+        <Router>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/pending-approval" element={<PendingApproval />} />
 
-            <Route
-              path="/admin"
-              element={
-                <PrivateRoute allowedRoles={['admin']}>
-                  <AdminDashboard />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/admin"
+                element={
+                  <PrivateRoute allowedRoles={['admin']}>
+                    <AdminDashboard />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/formateur"
-              element={
-                <PrivateRoute allowedRoles={['formateur', 'admin']}>
-                  <FormateurDashboard />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/formateur"
+                element={
+                  <PrivateRoute allowedRoles={['formateur', 'admin']}>
+                    <FormateurDashboard />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/responsable"
-              element={
-                <PrivateRoute allowedRoles={['Responsable', 'admin']}>
-                  <ResponsableDashboard />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/responsable"
+                element={
+                  <PrivateRoute allowedRoles={['Responsable', 'admin']}>
+                    <ResponsableDashboard />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/participant"
-              element={
-                <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
-                  <ParticipantDashboard />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/participant"
+                element={
+                  <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
+                    <ParticipantDashboard />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/student-dashboard"
-              element={
-                <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
-                  <StudentDashboard />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/student-dashboard"
+                element={
+                  <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
+                    <StudentDashboard />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/student-formations"
-              element={
-                <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
-                  <StudentFormations />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/student-formations"
+                element={
+                  <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
+                    <StudentFormations />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/student-formation/:id"
-              element={
-                <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
-                  <StudentFormationDetails />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/student-formation/:id"
+                element={
+                  <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
+                    <StudentFormationDetails />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/student-history"
-              element={
-                <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
-                  <StudentHistory />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/student-history"
+                element={
+                  <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
+                    <StudentHistory />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/student-session/:id"
-              element={
-                <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
-                  <StudentSessionDetails />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/student-session/:id"
+                element={
+                  <PrivateRoute allowedRoles={['student', 'élève', 'admin']}>
+                    <StudentSessionDetails />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/calendar"
-              element={
-                <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin', 'student', 'élève']}>
-                  <Calendar />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/calendar"
+                element={
+                  <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin', 'student', 'élève']}>
+                    <Calendar />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/profile"
-              element={
-                <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin', 'student', 'élève']}>
-                  <Profile />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute allowedRoles={['Responsable', 'formateur', 'admin', 'student', 'élève']}>
+                    <Profile />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/attendance/:sessionId"
-              element={
-                <PrivateRoute allowedRoles={['formateur', 'admin']}>
-                  <AttendancePage />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/attendance/:sessionId"
+                element={
+                  <PrivateRoute allowedRoles={['formateur', 'admin']}>
+                    <AttendancePage />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route path="/success" element={<Successful />} />
-            <Route path="/unsuccessful" element={<Unsuccessful />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-          <AccessibilityWidget />
-        </AuthProvider>
-      </Router>
-    </AccessibilityProvider>
+              <Route path="/success" element={<Successful />} />
+              <Route path="/unsuccessful" element={<Unsuccessful />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+            <AccessibilityWidget />
+          </AuthProvider>
+        </Router>
+      </AccessibilityProvider>
+    </ColorBlindnessProvider>
   );
 }
 

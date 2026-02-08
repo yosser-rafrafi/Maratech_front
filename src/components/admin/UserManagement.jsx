@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../../config/api';
 import ConfirmModal, { STATUS_LABELS } from '../ConfirmModal';
 import AlertModal from '../AlertModal';
@@ -23,7 +24,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
         title: '',
         message: '',
         variant: 'primary',
-        onConfirm: () => {}
+        onConfirm: () => { }
     });
 
     // Alert modal (success/error feedback)
@@ -352,7 +353,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                     <button
                                                         title="Approuver"
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                        onClick={() => handleStatusChange(u._id, 'active')}
+                                                        onClick={() => handleStatusChange(u, 'active')}
                                                     >
                                                         <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>
                                                         <span>Approuver</span>
@@ -360,74 +361,10 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                     <button
                                                         title="Rejeter"
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                        onClick={() => handleDelete(u)}
+                                                        onClick={() => handleStatusChange(u, 'rejected')}
                                                     >
-                                                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
-                                                        <span>Supprimer</span>
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                /* Staff actions - full set with improved styling */
-                                                <>
-                                                    {canApprove && u.status === 'pending' && (
-                                                        <>
-                                                            <button
-                                                                title="Approuver"
-                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                                onClick={() => handleStatusChange(u, 'active')}
-                                                            >
-                                                                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>
-                                                                <span>Approuver</span>
-                                                            </button>
-                                                            <button
-                                                                title="Rejeter"
-                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                                onClick={() => handleStatusChange(u, 'rejected')}
-                                                            >
-                                                                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>cancel</span>
-                                                                <span>Rejeter</span>
-                                                            </button>
-                                                        </>
-                                                    )}
-                                                    {u.status === 'active' && (
-                                                        <button
-                                                            title="Suspendre"
-                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                            onClick={() => handleStatusChange(u, 'suspended')}
-                                                        >
-                                                            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>pause_circle</span>
-                                                            <span>Suspendre</span>
-                                                        </button>
-                                                    )}
-                                                    {u.status === 'suspended' && (
-                                                        <button
-                                                            title="Réactiver"
-                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                            onClick={() => handleStatusChange(u, 'active')}
-                                                        >
-                                                            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>play_circle</span>
-                                                            <span>Réactiver</span>
-                                                        </button>
-                                                    )}
-                                                    <button
-                                                        title="Modifier"
-                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                        onClick={() => {
-                                                            setEditingUser(u._id);
-                                                            setUserData({ name: u.name, email: u.email, role: u.role, password: '' });
-                                                            setShowForm(true);
-                                                        }}
-                                                    >
-                                                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>edit</span>
-                                                        <span>Modifier</span>
-                                                    </button>
-                                                    <button
-                                                        title="Supprimer"
-                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                        onClick={() => handleDelete(u)}
-                                                    >
-                                                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
-                                                        <span>Supprimer</span>
+                                                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>cancel</span>
+                                                        <span>Rejeter</span>
                                                     </button>
                                                 </>
                                             )}
@@ -435,7 +372,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                 <button
                                                     title="Suspendre"
                                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                    onClick={() => handleStatusChange(u._id, 'suspended')}
+                                                    onClick={() => handleStatusChange(u, 'suspended')}
                                                 >
                                                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>pause_circle</span>
                                                     <span>Suspendre</span>
@@ -445,7 +382,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                 <button
                                                     title="Réactiver"
                                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                    onClick={() => handleStatusChange(u._id, 'active')}
+                                                    onClick={() => handleStatusChange(u, 'active')}
                                                 >
                                                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>play_circle</span>
                                                     <span>Réactiver</span>
@@ -466,7 +403,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                             <button
                                                 title="Supprimer"
                                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                onClick={() => handleDelete(u._id)}
+                                                onClick={() => handleDelete(u)}
                                             >
                                                 <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
                                                 <span>Supprimer</span>

@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import ColorBlindnessSelector from '../components/ColorBlindnessSelector';
+import LanguageSelector from '../components/LanguageSelector';
 
 const Login = () => {
     const { login } = useAuth();
@@ -156,6 +158,11 @@ const Login = () => {
                 }
             `}</style>
 
+            {/* Language Selector - Top Right Corner */}
+            <div className="fixed top-6 right-6 z-50">
+                <LanguageSelector />
+            </div>
+
             <div className="flex h-screen w-full overflow-hidden">
                 {/* Left Panel - Tech Design */}
                 <div className="hidden lg:flex lg:w-3/5 relative overflow-hidden tech-bg">
@@ -293,6 +300,11 @@ const Login = () => {
                                 {t('auth.no_account')}
                                 <Link to="/signup" className="text-primary font-extrabold hover:underline underline-offset-4 ml-1">{t('auth.register')}</Link>
                             </p>
+                        </div>
+
+                        {/* Color Blindness Accessibility */}
+                        <div className="mt-6 flex justify-center">
+                            <ColorBlindnessSelector />
                         </div>
 
                         <div className="mt-auto lg:mt-12 pt-8 border-t border-slate-100 w-full">
