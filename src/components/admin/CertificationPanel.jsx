@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../config/api';
+import AlertModal from '../AlertModal';
+import ConfirmModal from '../ConfirmModal';
 
 const CertificationPanel = () => {
     const [users, setUsers] = useState([]);
@@ -7,6 +9,8 @@ const CertificationPanel = () => {
     const [selectedUser, setSelectedUser] = useState('');
     const [selectedFormation, setSelectedFormation] = useState('');
     const [loading, setLoading] = useState(false);
+    const [alertModal, setAlertModal] = useState({ isOpen: false, title: '', message: '', variant: 'success' });
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {} });
 
     useEffect(() => {
         const load = async () => {
@@ -27,31 +31,76 @@ const CertificationPanel = () => {
     const [generatedCert, setGeneratedCert] = useState(null);
 
     const handleGenerate = async () => {
-        if (!selectedUser || !selectedFormation) return alert('Sélectionnez un utilisateur et une formation');
+        if (!selectedUser || !selectedFormation) {
+            setAlertModal({ isOpen: true, title: 'Attention', message: 'Sélectionnez un utilisateur et une formation.', variant: 'error' });
+            return;
+        }
 
         setLoading(true);
         setGeneratedCert(null);
         try {
-            // Check eligibility first (Frontend check via API)
             const eligibleRes = await api.get(`/admin/certification/eligible/${selectedUser}/${selectedFormation}`);
             if (!eligibleRes.data.eligible) {
-                alert(`L'utilisateur n'est pas éligible : ${eligibleRes.data.reason}`);
+                setAlertModal({
+                    isOpen: true,
+                    title: 'Non éligible',
+                    message: `L'utilisateur n'est pas éligible : ${eligibleRes.data.reason}`,
+                    variant: 'error'
+                });
                 setLoading(false);
                 return;
             }
 
-            // Generate
-            if (window.confirm('Générer le certificat ? Cela validera officiellement la formation pour cet étudiant.')) {
-                const res = await api.post('/admin/certification/generate', { userId: selectedUser, formationId: selectedFormation });
-                setGeneratedCert(res.data.certificate);
-                alert('Certificat généré avec succès !');
-            }
+            setConfirmModal({
+                isOpen: true,
+                title: 'Générer le certificat',
+                message: 'Cela validera officiellement la formation pour cet étudiant. Continuer ?',
+                onConfirm: async () => {
+                    try {
+                        const res = await api.post('/admin/certification/generate', { userId: selectedUser, formationId: selectedFormation });
+                        setGeneratedCert(res.data.certificate);
+                        setAlertModal({
+                            isOpen: true,
+                            title: 'Succès',
+                            message: 'Certificat généré avec succès !',
+                            variant: 'success'
+                        });
+                    } catch (err) {
+                        if (err.response?.data?.certificate) {
+                            setGeneratedCert(err.response.data.certificate);
+                            setAlertModal({
+                                isOpen: true,
+                                title: 'Information',
+                                message: 'Un certificat existe déjà pour cet utilisateur et cette formation.',
+                                variant: 'error'
+                            });
+                        } else {
+                            setAlertModal({
+                                isOpen: true,
+                                title: 'Erreur',
+                                message: err.response?.data?.error || 'Erreur lors de la génération.',
+                                variant: 'error'
+                            });
+                        }
+                    }
+                }
+            });
         } catch (error) {
             if (error.response?.data?.certificate) {
                 setGeneratedCert(error.response.data.certificate);
-                alert('Un certificat existe déjà pour cet utilisateur et cette formation.');
+                setAlertModal({
+                    isOpen: true,
+                    title: 'Information',
+                    message: 'Un certificat existe déjà pour cet utilisateur et cette formation.',
+                    variant: 'error'
+                });
             } else {
-                alert(error.response?.data?.error || 'Erreur lors de la génération');
+                setAlertModal({
+                    isOpen: true,
+                    title: 'Erreur',
+                    message: error.response?.data?.error || 'Erreur lors de la génération.',
+                    variant: 'error'
+                });
             }
         } finally {
             setLoading(false);
@@ -71,7 +120,12 @@ const CertificationPanel = () => {
             link.click();
             link.remove();
         } catch (error) {
-            alert('Erreur lors du téléchargement du PDF');
+            setAlertModal({
+                isOpen: true,
+                title: 'Erreur',
+                message: 'Erreur lors du téléchargement du PDF.',
+                variant: 'error'
+            });
         }
     };
 
@@ -138,6 +192,25 @@ const CertificationPanel = () => {
                     </div>
                 )}
             </div>
+
+            <AlertModal
+                isOpen={alertModal.isOpen}
+                onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
+                title={alertModal.title}
+                message={alertModal.message}
+                variant={alertModal.variant}
+                okLabel="OK"
+            />
+
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmLabel="Générer"
+                cancelLabel="Annuler"
+            />
         </div>
     );
 };

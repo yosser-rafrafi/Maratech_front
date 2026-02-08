@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import Sidebar from '../components/Sidebar';
+import AlertModal from '../components/AlertModal';
 import api from '../config/api';
 import './Dashboard.css'; // Reuse dashboard styles
 
@@ -13,6 +14,12 @@ const Profile = () => {
         name: user?.name || '',
         email: user?.email || '',
         password: ''
+    });
+    const [alertModal, setAlertModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        variant: 'success'
     });
 
     if (!user) return <div>{t('common.loading')}</div>;
@@ -29,9 +36,19 @@ const Profile = () => {
             setUser(res.data.user);
             setIsEditing(false);
             setFormData({ ...formData, password: '' });
-            alert(t('profile.update_success'));
+            setAlertModal({
+                isOpen: true,
+                title: 'Succès',
+                message: 'Profil mis à jour avec succès.',
+                variant: 'success'
+            });
         } catch (error) {
-            alert(error.response?.data?.error || t('profile.update_error'));
+            setAlertModal({
+                isOpen: true,
+                title: 'Erreur',
+                message: error.response?.data?.error || 'Erreur lors de la mise à jour.',
+                variant: 'error'
+            });
         }
     };
 
@@ -149,6 +166,15 @@ const Profile = () => {
                     </div>
                 </div>
             </main>
+
+            <AlertModal
+                isOpen={alertModal.isOpen}
+                onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
+                title={alertModal.title}
+                message={alertModal.message}
+                variant={alertModal.variant}
+                okLabel="OK"
+            />
         </div>
     );
 };

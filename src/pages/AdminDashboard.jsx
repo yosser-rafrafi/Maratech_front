@@ -15,6 +15,7 @@ const AdminDashboard = () => {
     const { user } = useAuth();
     const { t } = useTranslation();
     const [stats, setStats] = useState({ users: { total: 0, pending: 0 }, formations: 0, certificates: 0 });
+    const [chartData, setChartData] = useState({ formationDistribution: null, platformActivity: null });
     const [viewingStudent, setViewingStudent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'formations', 'users', 'certifications'
@@ -26,8 +27,12 @@ const AdminDashboard = () => {
     const fetchInitialData = async () => {
         setLoading(true);
         try {
-            const res = await api.get('/admin/stats');
-            setStats(res.data);
+            const [statsRes, chartsRes] = await Promise.all([
+                api.get('/admin/stats'),
+                api.get('/admin/stats/charts')
+            ]);
+            setStats(statsRes.data);
+            setChartData(chartsRes.data);
         } catch (err) { console.error(err); }
         setLoading(false);
     };
@@ -91,13 +96,13 @@ const AdminDashboard = () => {
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                                     <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.formation_distribution')}</h3>
                                     <div className="h-64">
-                                        <FormationDistributionChart />
+                                        <FormationDistributionChart data={chartData.formationDistribution} />
                                     </div>
                                 </div>
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                                     <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.platform_activity')}</h3>
                                     <div className="h-64">
-                                        <ProgressLineChart />
+                                        <ProgressLineChart data={chartData.platformActivity} />
                                     </div>
                                 </div>
                             </div>

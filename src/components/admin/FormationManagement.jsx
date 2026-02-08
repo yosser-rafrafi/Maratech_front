@@ -175,13 +175,29 @@ const FormationManagement = () => {
                 </div>
             ) : (
                 <div className="cards-grid">
-                    {filteredFormations.map((formation) => (
-                        <div key={formation._id} className={`card group hover:shadow-lg transition-all duration-300 ${!formation.active ? 'opacity-75 bg-slate-50 border-slate-200' : 'bg-white border-slate-200'}`}>
-                            <div className={`h-2 w-full rounded-t-xl mb-4 ${formation.active ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-slate-300'}`}></div>
+                    {filteredFormations.map((formation) => {
+                        const PALETTE = ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#64748b', '#0d9488', '#2563eb', '#7c3aed', '#be185d'];
+                        const PATTERNS = ['dots', 'hatching', 'triangles', 'diamonds', 'stripes-h', 'stripes-v', 'circles', 'grid', 'chevrons', 'waves', 'zigzag', 'cross', 'bricks', 'hexagons'];
+                        let hash = 0;
+                        const str = String(formation._id || '');
+                        for (let i = 0; i < str.length; i++) { hash = (hash << 5) - hash + str.charCodeAt(i); hash |= 0; }
+                        const cardColor = formation.color || PALETTE[Math.abs(hash) % PALETTE.length];
+                        const pattern = formation.pattern || PATTERNS[Math.abs(hash) % PATTERNS.length];
 
-                            <div className="px-5 pb-5">
+                        return (
+                        <div key={formation._id} className={`card group hover:shadow-lg transition-all duration-300 ${!formation.active ? 'opacity-75 bg-slate-50 border-slate-200' : 'bg-white border-slate-200'}`}>
+                            {/* Left band: color + geometric pattern (color-blind friendly) */}
+                            <div
+                                className={`formation-card-band ${!formation.active ? 'bg-slate-300' : ''}`}
+                                style={formation.active ? { backgroundColor: cardColor } : {}}
+                                title={formation.title}
+                            >
+                                <div className={`pattern-overlay formation-pattern-${pattern}`} style={{ opacity: formation.active ? 0.4 : 0.25 }} aria-hidden="true" />
+                            </div>
+
+                            <div className="formation-card-content">
                                 <div className="flex justify-between items-start mb-3">
-                                    <h3 className="font-bold text-lg text-slate-800 group-hover:text-indigo-600 transition-colors">
+                                    <h3 className="font-bold text-4xl text-slate-800 group-hover:text-indigo-600 transition-colors">
                                         {formation.title}
                                     </h3>
                                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${formation.active ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-600'}`}>
@@ -202,39 +218,37 @@ const FormationManagement = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-2 text-sm">
                                     <button
                                         onClick={() => setSelectedFormation(formation)}
-                                        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-sm shadow-indigo-200"
+                                        className="py-2.5 px-3 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-all font-medium"
                                     >
-                                        <span>⚙️</span> Gérer Sessions & Inscrits
+                                        Gérer
                                     </button>
-
-                                    <div className="flex gap-2 text-sm">
-                                        <button
-                                            onClick={() => handleEdit(formation)}
-                                            className="flex-1 py-2 px-3 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all font-medium"
-                                        >
-                                            Modifier
-                                        </button>
-                                        <button
-                                            onClick={() => handleArchive(formation._id, formation.active)}
-                                            className={`flex-1 py-2 px-3 border rounded-lg transition-all font-medium ${formation.active ? 'border-orange-200 text-orange-600 hover:bg-orange-50' : 'border-green-200 text-green-600 hover:bg-green-50'}`}
-                                        >
-                                            {formation.active ? 'Archiver' : 'Activer'}
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(formation._id)}
-                                            className="py-2 px-3 border border-red-100 text-red-600 rounded-lg hover:bg-red-50 hover:border-red-200 transition-all"
-                                            title="Supprimer définitivement"
-                                        >
-                                            🗑️
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={() => handleArchive(formation._id, formation.active)}
+                                        className={`py-2.5 px-3 rounded-lg transition-all font-medium ${formation.active ? 'bg-amber-50 text-amber-700 hover:bg-amber-100' : 'bg-green-50 text-green-700 hover:bg-green-100'}`}
+                                    >
+                                        {formation.active ? 'Archiver' : 'Activer'}
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(formation._id)}
+                                        className="py-2.5 px-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all font-medium"
+                                        title="Supprimer définitivement"
+                                    >
+                                        Supprimer
+                                    </button>
+                                    <button
+                                        onClick={() => handleEdit(formation)}
+                                        className="py-2.5 px-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-all font-medium"
+                                    >
+                                        Modifier
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
 
