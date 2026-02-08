@@ -60,6 +60,26 @@ const StudentDashboard = () => {
         fetchDashboardData();
     }, []);
 
+    const handleDownloadCertificate = async (formationId, formationTitle) => {
+        try {
+            const response = await api.get(`/student/certificate/download/${formationId}`, {
+                responseType: 'blob'
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Certificat-${formationTitle.replace(/\s+/g, '_')}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading certificate:', error);
+            alert(t('common.error_download', 'Erreur lors du téléchargement du certificat.'));
+        }
+    };
+
     // Derived Data for UI
     const totalProgress = data.formations.length > 0
         ? Math.round(data.formations.reduce((acc, f) => acc + f.progress, 0) / data.formations.length)
@@ -193,7 +213,10 @@ const StudentDashboard = () => {
                                             <span className="text-xs font-bold text-slate-400">{t('student_dashboard.enrolled_learners', 'apprenants inscrits')}</span>
                                         </div>
                                         {featuredFormation.progress === 100 && (
-                                            <button className="flex items-center gap-3 px-8 py-3.5 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95">
+                                            <button
+                                                onClick={() => handleDownloadCertificate(featuredFormation._id, featuredFormation.title)}
+                                                className="flex items-center gap-3 px-8 py-3.5 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95"
+                                            >
                                                 <span className="material-symbols-outlined text-xl">download</span>
                                                 {t('student_dashboard.download_certificate', 'Télécharger le Certificat')}
                                             </button>

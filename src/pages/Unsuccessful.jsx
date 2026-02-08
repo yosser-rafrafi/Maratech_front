@@ -186,10 +186,10 @@ const Unsuccessful = () => {
                             <div className="speech-bubble absolute left-[105%] top-1/2 -translate-y-1/2 px-6 py-4 rounded-2xl w-[240px]">
                                 <div className="flex flex-col gap-1">
                                     <p className="text-slate-900 font-extrabold text-xl tracking-tight leading-tight">
-                                        {t('unsuccessful.access_denied', { defaultValue: 'Access Denied.' })}
+                                        {t('unsuccessful.access_denied')}
                                     </p>
                                     <p className="text-slate-900 font-extrabold text-xl tracking-tight leading-tight flex items-center gap-2">
-                                        {t('unsuccessful.try_again', { defaultValue: "Let's try that again!" })}
+                                        {t('unsuccessful.try_again')}
                                         <span className="material-symbols-outlined text-red-500 text-xl">warning</span>
                                     </p>
                                 </div>
@@ -222,19 +222,19 @@ const Unsuccessful = () => {
 
                         <div className="mb-8 flex items-center gap-3 bg-red-50 border border-red-200 p-4 rounded-xl text-red-600 animate-in fade-in slide-in-from-top-4 duration-300">
                             <span className="material-symbols-outlined">error</span>
-                            <span className="font-bold text-sm">{t('unsuccessful.auth_failed', { defaultValue: 'Authentication Failed' })}</span>
+                            <span className="font-bold text-sm">{t('unsuccessful.auth_failed')}</span>
                         </div>
 
                         <div className="mb-10">
-                            <h2 className="text-3xl font-extrabold text-slate-900 mb-2">{t('unsuccessful.title', { defaultValue: 'Login Failed' })}</h2>
-                            <p className="text-slate-500">{t('unsuccessful.message', { defaultValue: 'The credentials you provided were incorrect. Please try again.' })}</p>
+                            <h2 className="text-3xl font-extrabold text-slate-900 mb-2">{t('unsuccessful.title')}</h2>
+                            <p className="text-slate-500">{t('unsuccessful.message')}</p>
                         </div>
 
                         <button
                             onClick={() => navigate('/login')}
                             className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-slate-200 transition-all transform hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2"
                         >
-                            {t('unsuccessful.return_to_login', { defaultValue: 'Return to Login' })}
+                            {t('unsuccessful.return_to_login')}
                             <span className="material-symbols-outlined">arrow_back</span>
                         </button>
                     </div>

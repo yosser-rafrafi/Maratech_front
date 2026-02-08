@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 
 const Successful = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
+    const fromLogin = location.state?.from === 'login';
     const { t } = useTranslation();
     const mascotHeadRef = useRef(null);
     const eyeLeftRef = useRef(null);
@@ -210,7 +212,7 @@ const Successful = () => {
                             {/* Speech Bubble */}
                             <div className="speech-bubble absolute left-[105%] top-1/2 -translate-y-1/2 px-6 py-4 rounded-2xl whitespace-nowrap">
                                 <p className="text-slate-900 font-extrabold text-xl tracking-tight flex items-center gap-2">
-                                    {t('successful.welcome_back', { defaultValue: 'Welcome back!' })}
+                                    {fromLogin ? t('successful.welcome_back') : t('successful.account_created')}
                                     <span className="material-symbols-outlined text-green-500 fill-1">verified</span>
                                 </p>
                             </div>
@@ -247,10 +249,14 @@ const Successful = () => {
                         </div>
 
                         <div className="max-w-sm">
-                            <h2 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">{t('successful.title', { defaultValue: 'Authentication Successful' })}</h2>
+                            <h2 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
+                                {fromLogin ? t('successful.login_title') : t('successful.title')}
+                            </h2>
                             <p className="text-lg text-slate-500 leading-relaxed">
-                                {t('successful.redirecting', { defaultValue: 'Redirecting to your dashboard...' })} <br />
-                                <span className="font-bold text-green-500">{t('successful.session_established', { defaultValue: 'Secure session established.' })}</span>
+                                {t('successful.redirecting')} <br />
+                                <span className="font-bold text-green-500">
+                                    {fromLogin ? t('successful.session_established_login') : t('successful.session_established')}
+                                </span>
                             </p>
                         </div>
 

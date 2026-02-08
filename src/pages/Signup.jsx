@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import RobotMascot from '../components/RobotMascot';
 import LanguageSelector from '../components/LanguageSelector';
+import './Auth.css';
 
 const Signup = () => {
     const { signup } = useAuth();
@@ -46,7 +47,7 @@ const Signup = () => {
                 if (result?.status === 'pending' || result?.user?.status === 'pending' || (result?.success && !result.token)) {
                     navigate('/pending-approval');
                 } else {
-                    navigate('/success');
+                    navigate('/success', { state: { from: 'signup' } });
                 }
             }
         } catch (err) {

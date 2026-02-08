@@ -4,6 +4,19 @@ import api from '../config/api';
 import Sidebar from '../components/Sidebar';
 import './Calendar.css';
 
+// Lighten hex color by mixing with white (percent: 0-1)
+const lightenColor = (hex, percent = 0.6) => {
+    if (!hex || typeof hex !== 'string') return '#f1f5f9';
+    const c = hex.replace('#', '');
+    if (c.length !== 6) return hex;
+    const r = Math.min(255, Math.round(parseInt(c.slice(0, 2), 16) + (255 - parseInt(c.slice(0, 2), 16)) * percent));
+    const g = Math.min(255, Math.round(parseInt(c.slice(2, 4), 16) + (255 - parseInt(c.slice(2, 4), 16)) * percent));
+    const b = Math.min(255, Math.round(parseInt(c.slice(4, 6), 16) + (255 - parseInt(c.slice(4, 6), 16)) * percent));
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+};
+
+const DEFAULT_COLOR = '#6366f1';
+
 const Calendar = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [sessions, setSessions] = useState([]);
@@ -117,18 +130,36 @@ const Calendar = () => {
                 <div key={day} className={`calendar-cell ${hasActivity ? 'has-session' : ''}`}>
                     <span className="day-number">{day}</span>
                     <div className="cell-sessions">
-                        {dayFormations.map(f => (
-                            <div key={`form-${f._id}`} className="session-tag formation-start" title={`${t('dashboards.start', { defaultValue: 'Start' })}: ${f.title}`}>
-                                <span className="session-time">🏁 {t('dashboards.start', { defaultValue: 'START' })}</span>
-                                <span className="session-title">{f.title}</span>
-                            </div>
-                        ))}
-                        {daySessions.map(s => (
-                            <div key={`sess-${s._id}`} className="session-tag" title={`${s.startTime} - ${s.formation?.title}`}>
-                                <span className="session-time">{s.startTime}</span>
-                                <span className="session-title">{s.formation?.title}</span>
-                            </div>
-                        ))}
+                        {dayFormations.map(f => {
+                            const color = f.color || DEFAULT_COLOR;
+                            const bgLight = lightenColor(color, 0.5);
+                            return (
+                                <div
+                                    key={`form-${f._id}`}
+                                    className="session-tag formation-start"
+                                    title={`${t('dashboards.start', { defaultValue: 'Start' })}: ${f.title}`}
+                                    style={{ borderLeftColor: color, background: bgLight, color: '#1e293b' }}
+                                >
+                                    <span className="session-time">🏁 {t('dashboards.start', { defaultValue: 'START' })}</span>
+                                    <span className="session-title">{f.title}</span>
+                                </div>
+                            );
+                        })}
+                        {daySessions.map(s => {
+                            const color = s.formation?.color || DEFAULT_COLOR;
+                            const bgLight = lightenColor(color, 0.7);
+                            return (
+                                <div
+                                    key={`sess-${s._id}`}
+                                    className="session-tag"
+                                    title={`${s.startTime} - ${s.formation?.title}`}
+                                    style={{ borderLeftColor: color, background: bgLight, color: '#1e293b' }}
+                                >
+                                    <span className="session-time">{s.startTime}</span>
+                                    <span className="session-title">{s.formation?.title}</span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             );

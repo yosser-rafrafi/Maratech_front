@@ -4,7 +4,7 @@ import api from '../../config/api';
 import ConfirmModal, { STATUS_LABELS } from '../ConfirmModal';
 import AlertModal from '../AlertModal';
 
-const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title = 'Gestion des États', showRoleFilter = true, onViewDetails }) => {
+const UserManagement = ({ allowedRoles = ['student'], canApprove = false, canDelete = true, title, showRoleFilter = true, onViewDetails }) => {
     const { t } = useTranslation();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -156,16 +156,16 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
         return <span className={`px-2 py-1 rounded-full text-xs font-semibold ${colors[status] || 'bg-gray-100'}`}>{status}</span>;
     };
 
-    if (loading) return <div>Chargement...</div>;
+    if (loading) return <div>{t('common.loading')}</div>;
 
     return (
         <div className="dashboard-section">
             <div className="flex justify-between items-center mb-4">
-                <h2>{title}</h2>
+                <h2>{title || t('dashboards.users_management')}</h2>
                 <div className="flex flex-wrap items-center gap-4">
                     <input
                         type="text"
-                        placeholder="Rechercher par nom ou email..."
+                        placeholder={t('users.search_placeholder', { defaultValue: 'Rechercher par nom ou email...' })}
                         value={searchName}
                         onChange={(e) => setSearchName(e.target.value)}
                         className="p-2 border rounded-lg text-sm min-w-[200px] placeholder:text-slate-400"
@@ -319,7 +319,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                         {filteredUsers.length === 0 ? (
-                            <tr><td colSpan="4" className="p-12 text-center text-slate-400">Aucun utilisateur trouvé.</td></tr>
+                            <tr><td colSpan="4" className="p-12 text-center text-slate-400">{t('users.no_users_found', { defaultValue: 'Aucun utilisateur trouvé.' })}</td></tr>
                         ) : (
                             filteredUsers.map(u => (
                                 <tr key={u._id} className="hover:bg-slate-50 transition-colors">
@@ -339,10 +339,10 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                     </td>
                                     <td className="p-4">
                                         <span className={`role-badge ${u.role}`}>
-                                            {u.role === 'student' ? 'Élève' :
-                                                u.role === 'formateur' ? 'Formateur' :
-                                                    u.role === 'Responsable' ? 'Responsable' :
-                                                        u.role === 'admin' ? 'Admin' : u.role}
+                                            {u.role === 'student' ? t('users.role_student') :
+                                                u.role === 'formateur' ? t('users.role_formateur') :
+                                                    u.role === 'Responsable' ? t('users.role_responsable') :
+                                                        u.role === 'admin' ? t('users.role_admin') : u.role}
                                         </span>
                                     </td>
                                     {userTypeTab !== 'eleves' && <td className="p-4">{getStatusBadge(u.status)}</td>}
@@ -351,45 +351,45 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                             {canApprove && u.status === 'pending' && (
                                                 <>
                                                     <button
-                                                        title="Approuver"
+                                                        title={t('common.approve')}
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-all duration-200 hover:shadow-sm"
                                                         onClick={() => handleStatusChange(u, 'active')}
                                                     >
                                                         <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>
-                                                        <span>Approuver</span>
+                                                        <span>{t('common.approve')}</span>
                                                     </button>
                                                     <button
-                                                        title="Rejeter"
+                                                        title={t('common.reject')}
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
                                                         onClick={() => handleStatusChange(u, 'rejected')}
                                                     >
                                                         <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>cancel</span>
-                                                        <span>Rejeter</span>
+                                                        <span>{t('common.reject')}</span>
                                                     </button>
                                                 </>
                                             )}
                                             {u.status === 'active' && (
                                                 <button
-                                                    title="Suspendre"
+                                                    title={t('common.suspend')}
                                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 rounded-lg transition-all duration-200 hover:shadow-sm"
                                                     onClick={() => handleStatusChange(u, 'suspended')}
                                                 >
                                                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>pause_circle</span>
-                                                    <span>Suspendre</span>
+                                                    <span>{t('common.suspend')}</span>
                                                 </button>
                                             )}
                                             {u.status === 'suspended' && (
                                                 <button
-                                                    title="Réactiver"
+                                                    title={t('common.reactivate')}
                                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:shadow-sm"
                                                     onClick={() => handleStatusChange(u, 'active')}
                                                 >
                                                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>play_circle</span>
-                                                    <span>Réactiver</span>
+                                                    <span>{t('common.reactivate')}</span>
                                                 </button>
                                             )}
                                             <button
-                                                title="Modifier"
+                                                title={t('common.edit')}
                                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg transition-all duration-200 hover:shadow-sm"
                                                 onClick={() => {
                                                     setEditingUser(u._id);
@@ -398,16 +398,18 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                 }}
                                             >
                                                 <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>edit</span>
-                                                <span>Modifier</span>
+                                                <span>{t('common.edit')}</span>
                                             </button>
-                                            <button
-                                                title="Supprimer"
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                onClick={() => handleDelete(u)}
-                                            >
-                                                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
-                                                <span>Supprimer</span>
-                                            </button>
+                                            {canDelete && (
+                                                <button
+                                                    title={t('common.delete')}
+                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
+                                                    onClick={() => handleDelete(u)}
+                                                >
+                                                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+                                                    <span>{t('common.delete')}</span>
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

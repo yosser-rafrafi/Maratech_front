@@ -14,7 +14,8 @@ import StudentDetails from '../components/admin/StudentDetails';
 const ResponsableDashboard = () => {
     const { user } = useAuth();
     const { t } = useTranslation();
-    const [stats, setStats] = useState({ formations: 0, students: 0 });
+    const [stats, setStats] = useState({ formations: 0, students: 0, successRate: 0, totalHours: 0 });
+    const [chartData, setChartData] = useState({ formationDistribution: null, platformActivity: null });
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'formations', 'students', 'certifications'
     const [viewingStudent, setViewingStudent] = useState(null);
@@ -26,17 +27,17 @@ const ResponsableDashboard = () => {
     const fetchStats = async () => {
         setLoading(true);
         try {
-            // Fetch basic stats for dashboard overview
-            const [fRes, uRes] = await Promise.all([
-                api.get('/formations'),
-                api.get('/admin/users')
+            const [statsRes, chartsRes] = await Promise.all([
+                api.get('/admin/stats'),
+                api.get('/admin/stats/charts')
             ]);
-
-            const students = uRes.data.users.filter(u => u.role === 'student');
             setStats({
-                formations: fRes.data.formations.length,
-                students: students.length
+                formations: statsRes.data.formations || 0,
+                students: statsRes.data.students || 0,
+                successRate: statsRes.data.successRate ?? 0,
+                totalHours: statsRes.data.totalHours ?? 0
             });
+            setChartData(chartsRes.data);
         } catch (err) { console.error(err); }
         setLoading(false);
     };
@@ -79,13 +80,13 @@ const ResponsableDashboard = () => {
                                 />
                                 <StatCard
                                     title={t('dashboards.stats.success_rate')}
-                                    value="92%"
+                                    value={`${stats.successRate}%`}
                                     icon="emoji_events"
                                     color="#f59e0b"
                                 />
                                 <StatCard
                                     title={t('dashboards.stats.total_hours')}
-                                    value="1,240"
+                                    value={stats.totalHours?.toLocaleString?.() ?? stats.totalHours}
                                     icon="schedule"
                                     color="#8b5cf6"
                                 />
@@ -96,13 +97,13 @@ const ResponsableDashboard = () => {
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                                     <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.student_distribution')}</h3>
                                     <div className="h-64">
-                                        <FormationDistributionChart />
+                                        <FormationDistributionChart data={chartData.formationDistribution} />
                                     </div>
                                 </div>
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                                     <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.general_progress')}</h3>
                                     <div className="h-64">
-                                        <ProgressLineChart />
+                                        <ProgressLineChart data={chartData.platformActivity} />
                                     </div>
                                 </div>
                             </div>
@@ -115,6 +116,7 @@ const ResponsableDashboard = () => {
                         <UserManagement
                             allowedRoles={['student', 'formateur']}
                             canApprove={false}
+                            canDelete={false}
                             title={t('dashboards.users_management')}
                             showRoleFilter={true}
                             onViewDetails={setViewingStudent}

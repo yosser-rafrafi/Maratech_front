@@ -173,10 +173,10 @@ const PendingApproval = () => {
                             <div className="speech-bubble absolute left-[105%] top-1/2 -translate-y-1/2 px-6 py-4 rounded-2xl w-[240px]">
                                 <div className="flex flex-col">
                                     <p className="text-slate-900 font-extrabold text-xl tracking-tight leading-tight">
-                                        {t('pending.speech_line1', { defaultValue: "Your request isn't" })}
+                                        {t('pending.speech_line1')}
                                     </p>
                                     <p className="text-slate-900 font-extrabold text-xl tracking-tight leading-tight">
-                                        {t('pending.speech_line2', { defaultValue: 'approved yet!' })}
+                                        {t('pending.speech_line2')}
                                     </p>
                                 </div>
                             </div>
@@ -205,23 +205,23 @@ const PendingApproval = () => {
                             <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-3xl mb-6">
                                 <span className="material-symbols-outlined text-5xl text-primary font-light">schedule</span>
                             </div>
-                            <h2 className="text-3xl font-extrabold text-slate-900 mb-4">{t('pending.title', { defaultValue: 'Account pending approval' })}</h2>
+                            <h2 className="text-3xl font-extrabold text-slate-900 mb-4">{t('pending.title')}</h2>
                             <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 text-left">
                                 <p className="text-slate-600 leading-relaxed mb-4">
-                                    {t('pending.message1', { defaultValue: 'Your registration request has been received successfully. To ensure platform security, each account must be manually verified.' })}
+                                    {t('pending.message1')}
                                 </p>
                                 <p className="text-slate-600 leading-relaxed">
-                                    {t('pending.message2', { defaultValue: 'An administrator is currently reviewing your information. You will receive a confirmation email once your access is activated.' })}
+                                    {t('pending.message2')}
                                 </p>
                             </div>
                         </div>
                         <div className="flex flex-col gap-4">
                             <Link to="/login" className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-slate-200 transition-all flex items-center justify-center gap-2 group">
                                 <span className="material-symbols-outlined text-xl transition-transform group-hover:-translate-x-1">arrow_back</span>
-                                {t('pending.back_to_login', { defaultValue: 'Back to login' })}
+                                {t('pending.back_to_login')}
                             </Link>
                             <p className="text-center text-slate-500 text-sm mt-4">
-                                {t('pending.need_help', { defaultValue: 'Need help?' })} <a className="text-primary font-bold hover:underline" href="#">{t('common.footer.support')}</a>
+                                {t('pending.need_help')} <a className="text-primary font-bold hover:underline" href="#">{t('common.footer.support')}</a>
                             </p>
                         </div>
                     </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAccessibility } from '../context/AccessibilityContext';
 
 const AccessibilityWidget = () => {
-    const { zoomLevel, increaseZoom, decreaseZoom, resetZoom } = useAccessibility();
+    const { zoomLevel, increaseZoom, decreaseZoom, resetZoom, voiceEnabled, toggleVoice } = useAccessibility();
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -13,6 +13,17 @@ const AccessibilityWidget = () => {
                     <div className="px-3 py-1 mb-1 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Zoom Level</span>
                         <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">{zoomLevel}%</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 px-1 py-1 border-b border-slate-100 dark:border-slate-800">
+                        <span className="material-symbols-outlined text-slate-500" style={{ fontSize: '18px' }}>record_voice_over</span>
+                        <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 flex-1">Voice (تونسي)</span>
+                        <button
+                            onClick={toggleVoice}
+                            className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all ${voiceEnabled ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400'}`}
+                        >
+                            {voiceEnabled ? 'ON' : 'OFF'}
+                        </button>
                     </div>
 
                     <div className="flex gap-2">

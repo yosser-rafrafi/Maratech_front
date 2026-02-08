@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import ColorBlindnessSelector from './ColorBlindnessSelector';
+import LanguageSelector from './LanguageSelector';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -10,9 +11,7 @@ const Sidebar = () => {
     const location = useLocation();
     const { t, i18n } = useTranslation();
 
-    const changeLanguage = (lng) => {
-        i18n.changeLanguage(lng);
-    };
+
 
     // Handle RTL direction based on language
     useEffect(() => {
@@ -110,24 +109,7 @@ const Sidebar = () => {
             </nav>
             <div className="sidebar-footer">
                 <div className="language-switcher">
-                    <div className="lang-grid">
-                        {[
-                            { code: 'fr', label: '🇫🇷 FR' },
-                            { code: 'en', label: '🇬🇧 EN' },
-                            { code: 'ar', label: '🇸🇦 AR' },
-                            { code: 'tn', label: '🇹🇳 TN' },
-                            { code: 'de', label: '🇩🇪 DE' },
-                            { code: 'zh', label: '🇨🇳 ZH' }
-                        ].map(lang => (
-                            <button
-                                key={lang.code}
-                                onClick={() => changeLanguage(lang.code)}
-                                className={`lang-btn ${i18n.language === lang.code ? 'active' : ''}`}
-                            >
-                                {lang.label}
-                            </button>
-                        ))}
-                    </div>
+                    <LanguageSelector direction="up" />
                 </div>
 
                 {/* Color Blindness Accessibility */}

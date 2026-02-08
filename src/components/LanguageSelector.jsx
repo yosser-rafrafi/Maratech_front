@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const LanguageSelector = () => {
+const LanguageSelector = ({ direction = 'down' }) => {
     const { i18n } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -46,28 +46,34 @@ const LanguageSelector = () => {
         return languages.find(lang => lang.code === i18n.language) || languages[0];
     };
 
+    const dropdownClasses = direction === 'up'
+        ? "absolute right-0 bottom-full mb-3 w-64 bg-white rounded-2xl shadow-2xl border-2 border-slate-100 z-50 overflow-hidden animate-slide-down origin-bottom-right"
+        : "absolute right-0 top-full mt-3 w-64 bg-white rounded-2xl shadow-2xl border-2 border-slate-100 z-50 overflow-hidden animate-slide-down origin-top-right";
+
     return (
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/90 hover:bg-white border-2 border-slate-200 hover:border-blue-400 transition-all duration-200 shadow-md hover:shadow-lg backdrop-blur-sm"
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/90 hover:bg-white border-2 border-slate-200 hover:border-blue-400 transition-all duration-200 shadow-md hover:shadow-lg backdrop-blur-sm ${direction === 'up' ? 'w-full justify-between' : ''}`}
                 title="Change Language"
                 aria-label="Language selector"
             >
-                <span className="material-symbols-outlined text-blue-600 text-xl">
-                    language
-                </span>
-                <span className="text-lg">{getCurrentLanguage().flag}</span>
-                <span className="font-semibold text-slate-700 hidden sm:inline">
-                    {getCurrentLanguage().code.toUpperCase()}
-                </span>
+                <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-blue-600 text-xl">
+                        language
+                    </span>
+                    <span className="text-lg">{getCurrentLanguage().flag}</span>
+                    <span className="font-semibold text-slate-700 hidden sm:inline">
+                        {getCurrentLanguage().code.toUpperCase()}
+                    </span>
+                </div>
                 <span className="material-symbols-outlined text-slate-400 text-sm">
-                    {isOpen ? 'expand_less' : 'expand_more'}
+                    {isOpen ? (direction === 'up' ? 'expand_more' : 'expand_less') : (direction === 'up' ? 'expand_less' : 'expand_more')}
                 </span>
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border-2 border-slate-100 z-50 overflow-hidden animate-slide-down">
+                <div className={dropdownClasses}>
                     <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b-2 border-slate-100">
                         <div className="flex items-center gap-2 mb-1">
                             <span className="material-symbols-outlined text-blue-600">translate</span>

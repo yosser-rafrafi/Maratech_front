@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import ColorBlindnessSelector from '../components/ColorBlindnessSelector';
 import LanguageSelector from '../components/LanguageSelector';
+import './Auth.css';
 
 const Login = () => {
     const { login } = useAuth();
@@ -80,8 +81,8 @@ const Login = () => {
                 navigate('/unsuccessful');
             } else if (result && result.id) {
                 // If result has an id, it's a user object (success)
-                console.log('Login successful, navigating to home');
-                navigate('/');
+                console.log('Login successful, navigating to success page');
+                navigate('/success', { state: { from: 'login' } });
             } else {
                 console.log('Unexpected result, navigating to /unsuccessful');
                 navigate('/unsuccessful');
@@ -96,67 +97,7 @@ const Login = () => {
 
     return (
         <div className="bg-background-light min-h-screen flex items-center justify-center font-display overflow-hidden">
-            <style>{`
-                .tech-bg {
-                    background-color: #020617;
-                    background-image: radial-gradient(circle at 2px 2px, rgba(59, 130, 246, 0.15) 1px, transparent 0);
-                    background-size: 40px 40px;
-                }
-                .grid-intersection {
-                    background-image: radial-gradient(circle at 50% 50%, #3b82f6 1px, transparent 1px);
-                    background-size: 40px 40px;
-                    opacity: 0.4;
-                }
-                .circuit-trace {
-                    stroke: #1e40af;
-                    stroke-width: 1;
-                    fill: none;
-                    opacity: 0.3;
-                }
-                .hologram-icon {
-                    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6));
-                    animation: float 6s ease-in-out infinite;
-                }
-                @keyframes float {
-                    0%, 100% { transform: translateY(0px) rotate(0deg); }
-                    50% { transform: translateY(-20px) rotate(5deg); }
-                }
-                .bemo-bot {
-                    transform-style: preserve-3d;
-                    transition: transform 0.1s ease-out;
-                }
-                .robot-body-textured {
-                    background: linear-gradient(145deg, #ffffff 0%, #cbd5e1 100%);
-                    box-shadow: 
-                        inset -5px -5px 15px rgba(0,0,0,0.1),
-                        inset 5px 5px 15px rgba(59, 130, 246, 0.2),
-                        0 10px 40px rgba(0,0,0,0.3);
-                    border: 1px solid rgba(255, 255, 255, 0.5);
-                }
-                .robot-face-glow {
-                    background: #0f172a;
-                    box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.3);
-                    border: 2px solid rgba(59, 130, 246, 0.2);
-                }
-                .robot-eye-glow {
-                    background: #60a5fa;
-                    box-shadow: 0 0 20px #3b82f6, 0 0 40px rgba(59, 130, 246, 0.4), inset 0 0 5px #fff;
-                }
-                .login-btn-glow {
-                    box-shadow: 0 0 20px rgba(19, 127, 236, 0.4);
-                    transition: all 0.3s ease;
-                }
-                .login-btn-glow:hover {
-                    box-shadow: 0 0 30px rgba(14, 165, 233, 0.6);
-                }
-                .data-stream {
-                    width: 1px;
-                    height: 100px;
-                    background: linear-gradient(to bottom, transparent, #3b82f6, transparent);
-                    position: absolute;
-                    opacity: 0.2;
-                }
-            `}</style>
+
 
             {/* Language Selector - Top Right Corner */}
             <div className="fixed top-6 right-6 z-50">

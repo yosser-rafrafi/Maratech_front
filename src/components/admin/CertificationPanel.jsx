@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../../config/api';
+import { speakAndDo } from '../../utils/speakTunisian';
 import AlertModal from '../AlertModal';
 import ConfirmModal from '../ConfirmModal';
 
 const CertificationPanel = () => {
+    const { t } = useTranslation();
     const [users, setUsers] = useState([]);
     const [formations, setFormations] = useState([]);
     const [selectedUser, setSelectedUser] = useState('');
@@ -32,7 +35,7 @@ const CertificationPanel = () => {
 
     const handleGenerate = async () => {
         if (!selectedUser || !selectedFormation) {
-            setAlertModal({ isOpen: true, title: 'Attention', message: 'Sélectionnez un utilisateur et une formation.', variant: 'error' });
+            setAlertModal({ isOpen: true, title: t('certifications.attention'), message: t('certifications.select_both'), variant: 'error' });
             return;
         }
 
@@ -43,8 +46,8 @@ const CertificationPanel = () => {
             if (!eligibleRes.data.eligible) {
                 setAlertModal({
                     isOpen: true,
-                    title: 'Non éligible',
-                    message: `L'utilisateur n'est pas éligible : ${eligibleRes.data.reason}`,
+                    title: t('certifications.not_eligible'),
+                    message: t('certifications.not_eligible_reason', { reason: eligibleRes.data.reason }),
                     variant: 'error'
                 });
                 setLoading(false);
@@ -53,16 +56,16 @@ const CertificationPanel = () => {
 
             setConfirmModal({
                 isOpen: true,
-                title: 'Générer le certificat',
-                message: 'Cela validera officiellement la formation pour cet étudiant. Continuer ?',
+                title: t('certifications.generate_confirm_title'),
+                message: t('certifications.generate_confirm_message'),
                 onConfirm: async () => {
                     try {
                         const res = await api.post('/admin/certification/generate', { userId: selectedUser, formationId: selectedFormation });
                         setGeneratedCert(res.data.certificate);
                         setAlertModal({
                             isOpen: true,
-                            title: 'Succès',
-                            message: 'Certificat généré avec succès !',
+                            title: t('certifications.success'),
+                            message: t('certifications.certificate_generated'),
                             variant: 'success'
                         });
                     } catch (err) {
@@ -70,15 +73,15 @@ const CertificationPanel = () => {
                             setGeneratedCert(err.response.data.certificate);
                             setAlertModal({
                                 isOpen: true,
-                                title: 'Information',
-                                message: 'Un certificat existe déjà pour cet utilisateur et cette formation.',
+                                title: t('certifications.info'),
+                                message: t('certifications.certificate_exists'),
                                 variant: 'error'
                             });
                         } else {
                             setAlertModal({
                                 isOpen: true,
-                                title: 'Erreur',
-                                message: err.response?.data?.error || 'Erreur lors de la génération.',
+                                title: t('certifications.error'),
+                                message: err.response?.data?.error || t('certifications.generation_error'),
                                 variant: 'error'
                             });
                         }
@@ -90,17 +93,17 @@ const CertificationPanel = () => {
                 setGeneratedCert(error.response.data.certificate);
                 setAlertModal({
                     isOpen: true,
-                    title: 'Information',
-                    message: 'Un certificat existe déjà pour cet utilisateur et cette formation.',
+                    title: t('certifications.info'),
+                    message: t('certifications.certificate_exists'),
                     variant: 'error'
                 });
             } else {
-                setAlertModal({
-                    isOpen: true,
-                    title: 'Erreur',
-                    message: error.response?.data?.error || 'Erreur lors de la génération.',
-                    variant: 'error'
-                });
+            setAlertModal({
+                isOpen: true,
+                title: t('certifications.error'),
+                message: error.response?.data?.error || t('certifications.generation_error'),
+                variant: 'error'
+            });
             }
         } finally {
             setLoading(false);
@@ -122,8 +125,8 @@ const CertificationPanel = () => {
         } catch (error) {
             setAlertModal({
                 isOpen: true,
-                title: 'Erreur',
-                message: 'Erreur lors du téléchargement du PDF.',
+                title: t('certifications.error'),
+                message: t('certifications.download_error'),
                 variant: 'error'
             });
         }
@@ -132,33 +135,33 @@ const CertificationPanel = () => {
     return (
         <div className="dashboard-section animation-fade-in full-width">
             <div className="section-header">
-                <h2>Génération de Certificats</h2>
-                <p>Vérifiez l'éligibilité et délivrez les certificats de fin de formation.</p>
+                <h2>{t('certifications.title')}</h2>
+                <p>{t('certifications.subtitle')}</p>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <div className="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
-                        <label className="block text-sm font-medium mb-2">Choisir l'Étudiant</label>
+                        <label className="block text-sm font-medium mb-2">{t('certifications.select_student')}</label>
                         <select
                             className="w-full p-3 border rounded-lg"
                             value={selectedUser}
                             onChange={(e) => { setSelectedUser(e.target.value); setGeneratedCert(null); }}
                         >
-                            <option value="">-- Sélectionner --</option>
+                            <option value="">{t('certifications.select_option')}</option>
                             {users.map(u => (
                                 <option key={u._id} value={u._id}>{u.name} ({u.email})</option>
                             ))}
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-2">Choisir la Formation</label>
+                        <label className="block text-sm font-medium mb-2">{t('certifications.select_formation')}</label>
                         <select
                             className="w-full p-3 border rounded-lg"
                             value={selectedFormation}
                             onChange={(e) => { setSelectedFormation(e.target.value); setGeneratedCert(null); }}
                         >
-                            <option value="">-- Sélectionner --</option>
+                            <option value="">{t('certifications.select_option')}</option>
                             {formations.map(f => (
                                 <option key={f._id} value={f._id}>{f.title}</option>
                             ))}
@@ -168,26 +171,26 @@ const CertificationPanel = () => {
 
                 <div className="flex justify-end">
                     <button
-                        onClick={handleGenerate}
+                        onClick={() => speakAndDo('VERIFY_ELIGIBILITY', handleGenerate)}
                         disabled={loading || !selectedUser || !selectedFormation}
                         className={`btn-primary px-8 py-3 text-lg ${loading ? 'opacity-70 cursor-wait' : ''}`}
                     >
-                        {loading ? 'Vérification...' : '🎓 Vérifier Éligibilité et Générer'}
+                        {loading ? t('certifications.verifying') : `🎓 ${t('certifications.verify_and_generate')}`}
                     </button>
                 </div>
 
                 {generatedCert && (
                     <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg flex justify-between items-center animation-fade-in">
                         <div>
-                            <h4 className="font-bold text-green-800 flex items-center gap-2">✅ Certificat Prêt</h4>
+                            <h4 className="font-bold text-green-800 flex items-center gap-2">✅ {t('certifications.certificate_ready')}</h4>
                             <p className="text-sm text-green-700">ID: {generatedCert.certificateId}</p>
-                            <p className="text-xs text-green-600">Délivré le: {new Date(generatedCert.issuedAt).toLocaleDateString()}</p>
+                            <p className="text-xs text-green-600">{t('certifications.issued_on')}: {new Date(generatedCert.issuedAt).toLocaleDateString()}</p>
                         </div>
                         <button
                             className="btn-primary bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
                             onClick={() => handleDownload(generatedCert)}
                         >
-                            📥 Télécharger PDF
+                            📥 {t('certifications.download_pdf')}
                         </button>
                     </div>
                 )}
@@ -208,8 +211,8 @@ const CertificationPanel = () => {
                 onConfirm={confirmModal.onConfirm}
                 title={confirmModal.title}
                 message={confirmModal.message}
-                confirmLabel="Générer"
-                cancelLabel="Annuler"
+                confirmLabel={t('certifications.generate_btn')}
+                cancelLabel={t('common.cancel')}
             />
         </div>
     );

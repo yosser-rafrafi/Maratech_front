@@ -69,6 +69,18 @@ const FormationDetails = ({ formation, onBack }) => {
     const handleSessionSubmit = async (e) => {
         e.preventDefault();
         try {
+            // Session date must be >= formation start date
+            if (formation.startDate && sessionData.date) {
+                const sessionDate = new Date(sessionData.date);
+                const formationStartDate = new Date(formation.startDate);
+                sessionDate.setHours(0, 0, 0, 0);
+                formationStartDate.setHours(0, 0, 0, 0);
+                if (sessionDate < formationStartDate) {
+                    alert('La date de la séance doit être égale ou postérieure à la date de début de la formation (' + new Date(formation.startDate).toLocaleDateString('fr-FR') + ').');
+                    return;
+                }
+            }
+
             // Calculate endTime from startTime + duration
             const [hours, minutes] = sessionData.startTime.split(':');
             const startDate = new Date();
@@ -386,6 +398,7 @@ const FormationDetails = ({ formation, onBack }) => {
                                     className="w-full p-2 border rounded-lg"
                                     value={sessionData.date}
                                     onChange={(e) => setSessionData({ ...sessionData, date: e.target.value })}
+                                    min={formation.startDate ? new Date(formation.startDate).toISOString().split('T')[0] : undefined}
                                     required
                                 />
                             </div>
