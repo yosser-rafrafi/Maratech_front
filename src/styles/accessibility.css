@@ -1,0 +1,286 @@
+/* Accessibility Styles for WCAG 2.1 AA Compliance */
+
+/* Screen Reader Only - Visually hidden but accessible to screen readers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* High Contrast Focus States - WCAG 2.1 Level AA */
+*:focus-visible {
+    outline: 3px solid #6366f1 !important;
+    outline-offset: 2px !important;
+    border-radius: 4px;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+    outline: 3px solid #6366f1 !important;
+    outline-offset: 2px !important;
+}
+
+/* Skip to content link */
+.skip-to-content {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #6366f1;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+    font-weight: 600;
+    z-index: 10000;
+    transition: top 0.3s;
+}
+
+.skip-to-content:focus {
+    top: 0;
+}
+
+/* Voice Control Animations */
+@keyframes pulse-ring {
+    0% {
+        transform: scale(0.95);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.05);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(0.95);
+        opacity: 1;
+    }
+}
+
+.voice-listening-pulse {
+    animation: pulse-ring 1.5s ease-in-out infinite;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+.voice-active-ripple::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #6366f1;
+    transform: translate(-50%, -50%);
+    animation: ripple 1.5s ease-out infinite;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .voice-listening-pulse,
+    .voice-active-ripple::before {
+        animation: none !important;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    *:focus-visible {
+        outline-width: 4px !important;
+        outline-color: currentColor !important;
+    }
+
+    button,
+    input,
+    select {
+        border-width: 2px !important;
+    }
+}
+
+/* Keyboard Navigation Helpers */
+.keyboard-nav-active *:focus {
+    outline: 3px solid #6366f1;
+    outline-offset: 2px;
+}
+
+/* ARIA Live Region Styling */
+[role="status"],
+[role="alert"],
+[aria-live] {
+    position: relative;
+}
+
+/* Color-blind Friendly Status Indicators */
+.status-present {
+    background-color: #22c55e;
+    position: relative;
+}
+
+.status-present::before {
+    content: '✓';
+    color: white;
+    font-weight: bold;
+}
+
+.status-absent {
+    background-color: #ef4444;
+    position: relative;
+}
+
+.status-absent::before {
+    content: '✗';
+    color: white;
+    font-weight: bold;
+}
+
+.status-late {
+    background-color: #f59e0b;
+    position: relative;
+}
+
+.status-late::before {
+    content: '⏰';
+}
+
+/* Enhanced Focus for Card Elements */
+.participant-card:focus-within {
+    box-shadow: 0 0 0 3px #6366f1, 0 4px 12px rgba(99, 102, 241, 0.25);
+    outline: none;
+}
+
+/* Accessible Button States */
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button:not(:disabled):hover {
+    transform: translateY(-1px);
+    transition: transform 0.2s;
+}
+
+button:not(:disabled):active {
+    transform: translateY(0);
+}
+
+/* Voice Control Panel Accessibility */
+.voice-panel {
+    position: relative;
+}
+
+.voice-status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.voice-status-idle {
+    background: #e2e8f0;
+    color: #64748b;
+}
+
+.voice-status-listening {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.voice-status-processing {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.voice-status-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Keyboard Shortcuts Overlay */
+.keyboard-shortcuts-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 2px solid #6366f1;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    max-width: 500px;
+    width: 90%;
+}
+
+.keyboard-shortcuts-overlay h3 {
+    margin-top: 0;
+    color: #1e293b;
+}
+
+.shortcut-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.shortcut-key {
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* Tooltip for Accessibility */
+.a11y-tooltip {
+    position: relative;
+}
+
+.a11y-tooltip[aria-label]:hover::after {
+    content: attr(aria-label);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 12px;
+    background: #1e293b;
+    color: white;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    margin-bottom: 8px;
+}

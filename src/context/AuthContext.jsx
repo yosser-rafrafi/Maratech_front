@@ -63,6 +63,8 @@ export const AuthProvider = ({ children }) => {
                 message: response.data.message
             };
         } catch (error) {
+            console.error("Signup error details:", error);
+            console.log("Signup URL:", api.defaults.baseURL + '/auth/signup');
             return {
                 success: false,
                 error: error.response?.data?.error || 'Signup failed'

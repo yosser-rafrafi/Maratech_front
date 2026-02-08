@@ -57,7 +57,6 @@ const FormationDetails = ({ formation, onBack }) => {
             setFormateurs(usersRes.data.users.filter(u => u.role === 'formateur'));
 
             // Fetch stats if active tab is participants? Or just fetch all.
-            // Let's lazy load stats or fetch now.
             const statsRes = await api.get(`/formations/${formation._id}/stats`);
             setStudentsStats(statsRes.data.students);
         } catch (error) {
@@ -146,8 +145,6 @@ const FormationDetails = ({ formation, onBack }) => {
         return sessions.filter(s => s.level === levelId);
     };
 
-    if (loading) return <div>Chargement des détails...</div>;
-
     const fetchStudents = async () => {
         try {
             const res = await api.get('/admin/users');
@@ -156,6 +153,31 @@ const FormationDetails = ({ formation, onBack }) => {
             setAvailableStudents(students);
         } catch (error) {
             console.error('Error fetching students:', error);
+        }
+    };
+
+    const handleAddLevel = async () => {
+        const title = prompt("Titre du niveau (ex: Niveau 5):", `Niveau ${levels.length + 1}`);
+        if (!title) return;
+
+        try {
+            await api.post(`/formations/${formation._id}/levels`, { title });
+            fetchData();
+        } catch (error) {
+            console.error('Error adding level:', error);
+            alert('Erreur lors de la création du niveau');
+        }
+    };
+
+    const handleDeleteLevel = async (levelId) => {
+        if (!window.confirm("Supprimer ce niveau ? Toutes les séances associées seront supprimées.")) return;
+
+        try {
+            await api.delete(`/formations/levels/${levelId}`);
+            fetchData();
+        } catch (error) {
+            console.error('Error deleting level:', error);
+            alert('Erreur lors de la suppression du niveau');
         }
     };
 
@@ -173,6 +195,8 @@ const FormationDetails = ({ formation, onBack }) => {
             alert(error.response?.data?.error || 'Erreur lors de l\'inscription');
         }
     };
+
+    if (loading) return <div>Chargement des détails...</div>;
 
     return (
         <div className="dashboard-section animation-fade-in">
@@ -202,16 +226,30 @@ const FormationDetails = ({ formation, onBack }) => {
 
             {activeTab === 'programme' ? (
                 <div className="space-y-6">
+                    <div className="flex justify-end">
+                        <button onClick={handleAddLevel} className="btn-primary">
+                            + Ajouter Niveau
+                        </button>
+                    </div>
                     {levels.map((level) => (
                         <div key={level._id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                             <div className="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
                                 <h3 className="font-semibold text-lg text-slate-800">{level.title}</h3>
-                                <button
-                                    onClick={() => openSessionModal(level)}
-                                    className="btn-small btn-primary"
-                                >
-                                    + Ajouter Séance
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => handleDeleteLevel(level._id)}
+                                        className="text-slate-400 hover:text-red-500 p-1"
+                                        title="Supprimer le niveau"
+                                    >
+                                        🗑️
+                                    </button>
+                                    <button
+                                        onClick={() => openSessionModal(level)}
+                                        className="btn-small btn-primary"
+                                    >
+                                        + Ajouter Séance
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="p-4">

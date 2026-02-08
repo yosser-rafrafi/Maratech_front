@@ -1,18 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import VoiceControlPanel from '../components/VoiceControlPanel';
+import { useTranslation } from 'react-i18next';
+import useVoiceAttendance from '../hooks/useVoiceAttendance';
+import { getStatusLabel } from '../utils/voiceUtils';
 import api from '../config/api';
 import './Dashboard.css';
+import '../styles/accessibility.css';
 
 const AttendancePage = () => {
     const { sessionId } = useParams();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [session, setSession] = useState(null);
     const [attendance, setAttendance] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [localChanges, setLocalChanges] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
+    const [announcement, setAnnouncement] = useState(''); // For ARIA live region announcements
 
     useEffect(() => {
         fetchSessionData();
@@ -28,7 +35,7 @@ const AttendancePage = () => {
             setAttendance(attendanceRes.data.attendance);
         } catch (error) {
             console.error('Error fetching session data:', error);
-            alert('Erreur lors du chargement des données');
+            alert(t('attendance.error_loading', { defaultValue: 'Erreur lors du chargement des données' }));
         } finally {
             setLoading(false);
         }
@@ -39,6 +46,16 @@ const AttendancePage = () => {
             ...prev,
             [participantId]: status
         }));
+
+        // Announce change to screen readers
+        const participant = session?.participants?.find(p => p._id === participantId);
+        if (participant) {
+            const statusLabel = getStatusLabel(status);
+            setAnnouncement(`${participant.name} marqué ${statusLabel}`);
+
+            // Clear announcement after screen reader captures it
+            setTimeout(() => setAnnouncement(''), 1000);
+        }
     };
 
     const handleSaveAll = async () => {
@@ -53,12 +70,12 @@ const AttendancePage = () => {
             );
 
             await Promise.all(updates);
-            alert('Présences enregistrées avec succès');
+            alert(t('attendance.save_success'));
             setLocalChanges({});
             navigate('/formateur');
         } catch (error) {
             console.error('Error saving attendance:', error);
-            alert('Erreur lors de l\'enregistrement');
+            alert(t('attendance.save_error'));
         } finally {
             setSaving(false);
         }
@@ -72,8 +89,16 @@ const AttendancePage = () => {
         return record?.status || null;
     };
 
-    if (loading) return <div className="dashboard-layout"><Sidebar /><main className="main-content">Chargement...</main></div>;
-    if (!session) return <div className="dashboard-layout"><Sidebar /><main className="main-content">Séance introuvable</main></div>;
+    // Initialize voice attendance hook
+    const voiceControl = useVoiceAttendance(
+        session?.participants || [],
+        handleStatusChange,
+        handleSaveAll,
+        () => navigate('/formateur')
+    );
+
+    if (loading) return <div className="dashboard-layout"><Sidebar /><main className="main-content">{t('common.loading')}</main></div>;
+    if (!session) return <div className="dashboard-layout"><Sidebar /><main className="main-content">{t('attendance.not_found')}</main></div>;
 
     const hasChanges = Object.keys(localChanges).length > 0;
     const presentCount = session.participants?.filter(p => {
@@ -93,8 +118,28 @@ const AttendancePage = () => {
 
     return (
         <div className="dashboard-layout">
+            {/* Skip to content link for accessibility */}
+            <a href="#main-content" className="skip-to-content">
+                Aller au contenu principal
+            </a>
+
+            {/* ARIA Live Region for announcements */}
+            <div
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                className="sr-only"
+            >
+                {announcement}
+            </div>
+
             <Sidebar />
-            <main className="main-content" style={{ backgroundColor: '#f8f9fa' }}>
+            <main
+                id="main-content"
+                className="main-content"
+                style={{ backgroundColor: '#f8f9fa' }}
+                tabIndex="-1"
+            >
                 <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
                     {/* Header */}
                     <div style={{ marginBottom: '32px' }}>
@@ -103,12 +148,12 @@ const AttendancePage = () => {
                             className="btn-secondary"
                             style={{ marginBottom: '16px' }}
                         >
-                            ← Retour
+                            ← {t('common.back')}
                         </button>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                             <div style={{ fontSize: '24px' }}>📋</div>
                             <h1 style={{ margin: 0, fontSize: '32px', fontWeight: '700', color: '#1e293b' }}>
-                                Gestion des Présences
+                                {t('attendance.title')}
                             </h1>
                         </div>
                         <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>
@@ -116,8 +161,24 @@ const AttendancePage = () => {
                         </p>
                     </div>
 
+                    {/* Voice Control Panel */}
+                    <VoiceControlPanel
+                        isListening={voiceControl.isListening}
+                        isSupported={voiceControl.isSupported}
+                        transcript={voiceControl.transcript}
+                        lastCommand={voiceControl.lastCommand}
+                        error={voiceControl.error}
+                        commandHistory={voiceControl.commandHistory}
+                        onToggleListening={voiceControl.toggleListening}
+                        onClearError={voiceControl.clearError}
+                    />
+
                     {/* Stats Cards */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px' }}>
+                    <div
+                        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px' }}
+                        aria-live="polite"
+                        aria-label="Statistiques de présence"
+                    >
                         <div style={{
                             background: 'white',
                             borderRadius: '16px',
@@ -126,7 +187,7 @@ const AttendancePage = () => {
                             textAlign: 'center'
                         }}>
                             <div style={{ fontSize: '14px', color: '#64748b', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                                <span>👥</span> PARTICIPANTS
+                                <span aria-hidden="true">👥</span> PARTICIPANTS
                             </div>
                             <div style={{ fontSize: '48px', fontWeight: '700', color: '#1e293b' }}>
                                 {session.participants?.length || 0}
@@ -214,7 +275,7 @@ const AttendancePage = () => {
                             </span>
                             <input
                                 type="text"
-                                placeholder="Rechercher un élève..."
+                                placeholder={t('attendance.search_student')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 style={{
@@ -228,6 +289,7 @@ const AttendancePage = () => {
                                 }}
                                 onFocus={(e) => e.target.style.borderColor = '#6366f1'}
                                 onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                                aria-label="Rechercher un participant"
                             />
                         </div>
                         <button
@@ -249,14 +311,14 @@ const AttendancePage = () => {
                                 boxShadow: hasChanges ? '0 4px 12px rgba(99, 102, 241, 0.3)' : 'none'
                             }}
                         >
-                            <span>💾</span> {saving ? 'Enregistrement...' : 'ENREGISTRER TOUT'}
+                            <span>💾</span> {saving ? t('common.saving', { defaultValue: 'Enregistrement...' }) : t('common.save_all')}
                         </button>
                     </div>
 
                     {/* Participants List */}
                     <div style={{ background: 'white', borderRadius: '16px', padding: '24px', border: '2px solid #e2e8f0' }}>
                         <div style={{ marginBottom: '16px', color: '#64748b', fontSize: '13px' }}>
-                            Total validé : {Object.keys(localChanges).length} / {session.participants?.length || 0} élèves
+                            {t('attendance.total_validated')} : {Object.keys(localChanges).length} / {session.participants?.length || 0} {t('sidebar.student').toLowerCase()}s
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {filteredParticipants.map(participant => {
@@ -266,6 +328,8 @@ const AttendancePage = () => {
                                 return (
                                     <div
                                         key={participant._id}
+                                        className="participant-card"
+                                        tabIndex="0"
                                         style={{
                                             display: 'flex',
                                             alignItems: 'center',
@@ -276,6 +340,8 @@ const AttendancePage = () => {
                                             border: isModified ? '2px solid #3b82f6' : '1px solid #e5e7eb',
                                             transition: 'all 0.2s'
                                         }}
+                                        role="group"
+                                        aria-label={`${participant.name}, ${currentStatus ? getStatusLabel(currentStatus) : 'statut non défini'}`}
                                     >
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
                                             <div style={{
@@ -357,8 +423,10 @@ const AttendancePage = () => {
                                                     gap: '6px',
                                                     boxShadow: currentStatus === 'present' ? '0 4px 12px rgba(34, 197, 94, 0.3)' : 'none'
                                                 }}
+                                                aria-label={`Marquer ${participant.name} présent`}
+                                                aria-pressed={currentStatus === 'present'}
                                             >
-                                                <span>{currentStatus === 'present' ? '✓' : '○'}</span> Présent
+                                                <span aria-hidden="true">{currentStatus === 'present' ? '✓' : '○'}</span> {t('attendance.present')}
                                             </button>
                                             <button
                                                 onClick={() => handleStatusChange(participant._id, 'late')}
@@ -377,8 +445,10 @@ const AttendancePage = () => {
                                                     gap: '6px',
                                                     boxShadow: currentStatus === 'late' ? '0 4px 12px rgba(245, 158, 11, 0.3)' : 'none'
                                                 }}
+                                                aria-label={`Marquer ${participant.name} en retard`}
+                                                aria-pressed={currentStatus === 'late'}
                                             >
-                                                <span>{currentStatus === 'late' ? '⏰' : '○'}</span> Retard
+                                                <span aria-hidden="true">{currentStatus === 'late' ? '⏰' : '○'}</span> {t('attendance.late')}
                                             </button>
                                             <button
                                                 onClick={() => handleStatusChange(participant._id, 'absent')}
@@ -397,8 +467,10 @@ const AttendancePage = () => {
                                                     gap: '6px',
                                                     boxShadow: currentStatus === 'absent' ? '0 4px 12px rgba(239, 68, 68, 0.3)' : 'none'
                                                 }}
+                                                aria-label={`Marquer ${participant.name} absent`}
+                                                aria-pressed={currentStatus === 'absent'}
                                             >
-                                                <span>{currentStatus === 'absent' ? '✗' : '○'}</span> Absent
+                                                <span aria-hidden="true">{currentStatus === 'absent' ? '✗' : '○'}</span> {t('attendance.absent')}
                                             </button>
                                         </div>
                                     </div>

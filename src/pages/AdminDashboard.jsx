@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import api from '../config/api';
 import Sidebar from '../components/Sidebar';
 import { StatCard, AttendanceChart, FormationDistributionChart, ProgressLineChart } from '../components/DashboardCharts';
@@ -12,6 +13,7 @@ import StudentDetails from '../components/admin/StudentDetails';
 
 const AdminDashboard = () => {
     const { user } = useAuth();
+    const { t } = useTranslation();
     const [stats, setStats] = useState({ users: { total: 0, pending: 0 }, formations: 0, certificates: 0 });
     const [chartData, setChartData] = useState({ formationDistribution: null, platformActivity: null });
     const [viewingStudent, setViewingStudent] = useState(null);
@@ -42,15 +44,15 @@ const AdminDashboard = () => {
             <main className="main-content">
                 <header className="page-header">
                     <div>
-                        <h1>Espace Administratif</h1>
-                        <p>Vue d'ensemble et analytiques de la plateforme.</p>
+                        <h1>{t('dashboards.admin_title')}</h1>
+                        <p>{t('dashboards.admin_subtitle')}</p>
                     </div>
 
                     <div className="header-tabs">
-                        <button className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Vue d'ensemble</button>
-                        <button className={`tab-btn ${activeTab === 'formations' ? 'active' : ''}`} onClick={() => setActiveTab('formations')}>Formations</button>
-                        <button className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>Utilisateurs</button>
-                        <button className={`tab-btn ${activeTab === 'certifications' ? 'active' : ''}`} onClick={() => setActiveTab('certifications')}>Certifications</button>
+                        <button className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>{t('dashboards.overview')}</button>
+                        <button className={`tab-btn ${activeTab === 'formations' ? 'active' : ''}`} onClick={() => setActiveTab('formations')}>{t('dashboards.formations')}</button>
+                        <button className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>{t('dashboards.users')}</button>
+                        <button className={`tab-btn ${activeTab === 'certifications' ? 'active' : ''}`} onClick={() => setActiveTab('certifications')}>{t('dashboards.certifications')}</button>
                     </div>
                 </header>
 
@@ -60,28 +62,28 @@ const AdminDashboard = () => {
                             {/* Key Metrics Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                 <StatCard
-                                    title="Utilisateurs Totaux"
+                                    title={t('dashboards.stats.total_users')}
                                     value={stats.users?.total || 0}
                                     icon="group"
                                     color="#3b82f6"
                                     trend={12}
                                 />
                                 <StatCard
-                                    title="En Attente"
+                                    title={t('dashboards.stats.pending_users')}
                                     value={stats.users?.pending || 0}
                                     icon="person_alert"
                                     color="#f59e0b"
                                     trend={-5}
                                 />
                                 <StatCard
-                                    title="Formations Actives"
+                                    title={t('dashboards.stats.active_formations')}
                                     value={stats.formations || 0}
                                     icon="school"
                                     color="#8b5cf6"
                                     trend={8}
                                 />
                                 <StatCard
-                                    title="Certificats"
+                                    title={t('dashboards.stats.certificates')}
                                     value={stats.certificates || 0}
                                     icon="workspace_premium"
                                     color="#10b981"
@@ -92,13 +94,13 @@ const AdminDashboard = () => {
                             {/* Charts Row */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Répartition par Formation</h3>
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.formation_distribution')}</h3>
                                     <div className="h-64">
                                         <FormationDistributionChart data={chartData.formationDistribution} />
                                     </div>
                                 </div>
                                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                                    <h3 className="text-lg font-bold text-slate-800 mb-6">Activité de la Plateforme</h3>
+                                    <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.platform_activity')}</h3>
                                     <div className="h-64">
                                         <ProgressLineChart data={chartData.platformActivity} />
                                     </div>
@@ -113,7 +115,7 @@ const AdminDashboard = () => {
                         <UserManagement
                             allowedRoles={['student', 'Responsable', 'formateur']}
                             canApprove={true}
-                            title="Gestion des Utilisateurs"
+                            title={t('dashboards.users_management')}
                             onViewDetails={setViewingStudent}
                         />
                     )}
@@ -121,7 +123,7 @@ const AdminDashboard = () => {
                     {activeTab === 'users' && viewingStudent && (
                         <div className="animation-fade-in">
                             <button onClick={() => setViewingStudent(null)} className="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-2">
-                                <span>←</span> Retour à la liste
+                                <span>←</span> {t('common.back')}
                             </button>
                             <StudentDetails student={viewingStudent} />
                         </div>

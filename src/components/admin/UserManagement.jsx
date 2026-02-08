@@ -4,6 +4,7 @@ import ConfirmModal, { STATUS_LABELS } from '../ConfirmModal';
 import AlertModal from '../AlertModal';
 
 const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title = 'Gestion des États', showRoleFilter = true, onViewDetails }) => {
+    const { t } = useTranslation();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('all');
@@ -174,10 +175,10 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                             onChange={(e) => setFilterStatus(e.target.value)}
                             className="p-2 border rounded-lg text-sm"
                         >
-                            <option value="all">Tous les statuts</option>
-                            <option value="active">Actif</option>
-                            <option value="pending">En attente</option>
-                            <option value="suspended">Suspendu</option>
+                            <option value="all">{t('common.all_statuses', { defaultValue: 'Tous les statuts' })}</option>
+                            <option value="active">{t('attendance.present')}</option>
+                            <option value="pending">{t('dashboards.stats.pending_users')}</option>
+                            <option value="suspended">{t('common.suspend')}</option>
                         </select>
                     )}
 
@@ -187,8 +188,8 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                             onChange={(e) => setFilterRole(e.target.value)}
                             className="p-2 border rounded-lg text-sm"
                         >
-                            <option value="all">Tous les rôles</option>
-                            {allowedRoles.map(r => <option key={r} value={r}>{r}</option>)}
+                            <option value="all">{t('common.all_roles', { defaultValue: 'Tous les rôles' })}</option>
+                            {allowedRoles.map(r => <option key={r} value={r}>{t(`sidebar.${r}`, { defaultValue: r })}</option>)}
                         </select>
                     )}
 
@@ -200,7 +201,7 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                             setShowForm(true);
                         }}
                     >
-                        + Nouveau
+                        + {t('common.new', { defaultValue: 'Nouveau' })}
                     </button>
                 </div>
             </div>
@@ -210,13 +211,13 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                     className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${userTypeTab === 'staff' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
                     onClick={() => setUserTypeTab('staff')}
                 >
-                    {allowedRoles.includes('Responsable') ? '👥 Personnels (Resp./Form.)' : '👨‍🏫 Formateurs'}
+                    {allowedRoles.includes('Responsable') ? t('sidebar.personnel') : `👨‍🏫 ${t('sidebar.formateur')}s`}
                 </button>
                 <button
                     className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${userTypeTab === 'eleves' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
                     onClick={() => setUserTypeTab('eleves')}
                 >
-                    🎓 Élèves
+                    🎓 {t('dashboards.eleves')}
                 </button>
             </div>
             {showForm && (
@@ -309,10 +310,10 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                 <table className="w-full text-sm">
                     <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-xs">
                         <tr>
-                            <th className="p-4 text-left">Utilisateur</th>
-                            <th className="p-4 text-left">Rôle</th>
-                            {userTypeTab !== 'eleves' && <th className="p-4 text-left">Statut</th>}
-                            <th className="p-4 text-right">Actions</th>
+                            <th className="p-4 text-left">{t('common.user', { defaultValue: 'Utilisateur' })}</th>
+                            <th className="p-4 text-left">{t('common.role')}</th>
+                            {userTypeTab !== 'eleves' && <th className="p-4 text-left">{t('common.status')}</th>}
+                            <th className="p-4 text-right">{t('common.actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
@@ -346,23 +347,18 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                     {userTypeTab !== 'eleves' && <td className="p-4">{getStatusBadge(u.status)}</td>}
                                     <td className="p-4 text-right">
                                         <div className="flex justify-end gap-2">
-                                            {u.role === 'student' ? (
-                                                /* Student actions - only edit and delete */
+                                            {canApprove && u.status === 'pending' && (
                                                 <>
                                                     <button
-                                                        title="Modifier"
-                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:shadow-sm"
-                                                        onClick={() => {
-                                                            setEditingUser(u._id);
-                                                            setUserData({ name: u.name, email: u.email, role: u.role, password: '' });
-                                                            setShowForm(true);
-                                                        }}
+                                                        title="Approuver"
+                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-all duration-200 hover:shadow-sm"
+                                                        onClick={() => handleStatusChange(u._id, 'active')}
                                                     >
-                                                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>edit</span>
-                                                        <span>Modifier</span>
+                                                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>
+                                                        <span>Approuver</span>
                                                     </button>
                                                     <button
-                                                        title="Supprimer"
+                                                        title="Rejeter"
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
                                                         onClick={() => handleDelete(u)}
                                                     >
@@ -435,6 +431,46 @@ const UserManagement = ({ allowedRoles = ['student'], canApprove = false, title 
                                                     </button>
                                                 </>
                                             )}
+                                            {u.status === 'active' && (
+                                                <button
+                                                    title="Suspendre"
+                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 rounded-lg transition-all duration-200 hover:shadow-sm"
+                                                    onClick={() => handleStatusChange(u._id, 'suspended')}
+                                                >
+                                                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>pause_circle</span>
+                                                    <span>Suspendre</span>
+                                                </button>
+                                            )}
+                                            {u.status === 'suspended' && (
+                                                <button
+                                                    title="Réactiver"
+                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:shadow-sm"
+                                                    onClick={() => handleStatusChange(u._id, 'active')}
+                                                >
+                                                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>play_circle</span>
+                                                    <span>Réactiver</span>
+                                                </button>
+                                            )}
+                                            <button
+                                                title="Modifier"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg transition-all duration-200 hover:shadow-sm"
+                                                onClick={() => {
+                                                    setEditingUser(u._id);
+                                                    setUserData({ name: u.name, email: u.email, role: u.role, password: '' });
+                                                    setShowForm(true);
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>edit</span>
+                                                <span>Modifier</span>
+                                            </button>
+                                            <button
+                                                title="Supprimer"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-200 hover:shadow-sm"
+                                                onClick={() => handleDelete(u._id)}
+                                            >
+                                                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+                                                <span>Supprimer</span>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

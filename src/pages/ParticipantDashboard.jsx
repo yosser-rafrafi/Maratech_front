@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import api from '../config/api';
 import Sidebar from '../components/Sidebar';
 import { StatCard, ProgressLineChart } from '../components/DashboardCharts';
@@ -7,6 +8,7 @@ import './Dashboard.css';
 
 const ParticipantDashboard = () => {
     const { user } = useAuth();
+    const { t } = useTranslation();
     const [availableSessions, setAvailableSessions] = useState([]);
     const [mySessions, setMySessions] = useState([]);
     const [missedSessions, setMissedSessions] = useState([]);
@@ -81,7 +83,7 @@ const ParticipantDashboard = () => {
             <div className="dashboard-layout">
                 <Sidebar />
                 <main className="main-content">
-                    <div className="empty-state">Chargement de votre parcours...</div>
+                    <div className="empty-state">{t('common.loading')}</div>
                 </main>
             </div>
         );
@@ -94,27 +96,27 @@ const ParticipantDashboard = () => {
             <main className="main-content">
                 <header className="page-header">
                     <div>
-                        <h1>Espace Apprenant</h1>
-                        <p>Suivez votre progression et inscrivez-vous aux sessions.</p>
+                        <h1>{t('dashboards.part_title')}</h1>
+                        <p>{t('dashboards.part_subtitle', { defaultValue: 'Suivez votre progression et inscrivez-vous aux sessions.' })}</p>
                     </div>
                 </header>
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-6">
                     <StatCard
-                        title="Formations Suivies"
+                        title={t('dashboards.stats.attended_sessions')}
                         value={mySessions.length}
                         icon="school"
                         color="#0ea5e9"
                     />
                     <StatCard
-                        title="Séances Manquées"
+                        title={t('dashboards.stats.missed_sessions')}
                         value={missedSessions.length}
                         icon="event_busy"
                         color="#ef4444"
                     />
                     <StatCard
-                        title="Taux de Complétion"
+                        title={t('dashboards.stats.completion_rate', { defaultValue: 'Taux de Complétion' })}
                         value="45%"
                         icon="donut_large"
                         color="#10b981"
@@ -123,7 +125,7 @@ const ParticipantDashboard = () => {
 
                 {/* Progress Chart */}
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8">
-                    <h3 className="text-lg font-bold text-slate-800 mb-6">Votre Progression Globale</h3>
+                    <h3 className="text-lg font-bold text-slate-800 mb-6">{t('dashboards.general_progress')}</h3>
                     <div className="h-64">
                         <ProgressLineChart />
                     </div>
@@ -132,11 +134,11 @@ const ParticipantDashboard = () => {
                 <div className="dashboard-grid">
                     <section className="dashboard-section">
                         <div className="section-header">
-                            <h2>Progression par Formation</h2>
+                            <h2>{t('dashboards.formation_distribution')}</h2>
                         </div>
                         {mySessions.length === 0 ? (
                             <div className="empty-state">
-                                <p>Inscrivez-vous à une session pour voir votre progression.</p>
+                                <p>{t('participant.enroll_prompt', { defaultValue: 'Enroll in a session to see your progress.' })}</p>
                             </div>
                         ) : (
                             <div className="progress-list">
@@ -158,7 +160,7 @@ const ParticipantDashboard = () => {
                                             </div>
                                             <div className="progress-meta">
                                                 {progress && (
-                                                    <span>{progress.attendedSessions} / {progress.totalSessions} séances complétées</span>
+                                                    <span>{progress.attendedSessions} / {progress.totalSessions} {t('participant.sessions_completed', { defaultValue: 'sessions completed' })}</span>
                                                 )}
                                             </div>
                                         </div>
@@ -170,12 +172,12 @@ const ParticipantDashboard = () => {
 
                     <section className="dashboard-section">
                         <div className="section-header">
-                            <h2>Séances Manquées</h2>
+                            <h2>{t('dashboards.stats.missed_sessions')}</h2>
                         </div>
                         {missedSessions.length === 0 ? (
                             <div className="empty-state">
                                 <span className="empty-icon">✅</span>
-                                <p>Félicitations ! Vous n'avez manqué aucune séance.</p>
+                                <p>{t('participant.no_missed', { defaultValue: 'Congratulations! You haven\'t missed any sessions.' })}</p>
                             </div>
                         ) : (
                             <div className="missed-list">
@@ -185,7 +187,7 @@ const ParticipantDashboard = () => {
                                             <strong>{session.formation?.title}</strong>
                                             <span>{new Date(session.date).toLocaleDateString()}</span>
                                         </div>
-                                        <span className="status-badge status-absent">Absent</span>
+                                        <span className="status-badge status-absent">{t('attendance.absent')}</span>
                                     </div>
                                 ))}
                             </div>
@@ -195,10 +197,10 @@ const ParticipantDashboard = () => {
 
                 <section className="dashboard-section">
                     <div className="section-header">
-                        <h2>Sessions Disponibles</h2>
+                        <h2>{t('dashboards.upcoming_sessions')}</h2>
                     </div>
                     {availableSessions.length === 0 ? (
-                        <p className="empty-state">Aucune nouvelle session disponible.</p>
+                        <p className="empty-state">{t('dashboards.no_weekly_sessions')}</p>
                     ) : (
                         <div className="cards-grid">
                             {availableSessions.map((session) => (
@@ -215,7 +217,7 @@ const ParticipantDashboard = () => {
                                         style={{ width: '100%', marginTop: '16px' }}
                                         disabled={session.participants?.length >= session.maxParticipants}
                                     >
-                                        S'inscrire
+                                        {t('common.enroll', { defaultValue: 'S\'inscrire' })}
                                     </button>
                                 </div>
                             ))}
